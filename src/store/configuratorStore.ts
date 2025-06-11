@@ -2,6 +2,8 @@
 import { create } from 'zustand';
 
 export type ProductType = 'tshirt' | 'hoodie' | 'totebag';
+export type CameraView = 'front' | 'back' | 'side';
+export type BackgroundPreset = 'studio' | 'white' | 'black' | 'gradient';
 
 interface LogoConfig {
   image: string | null;
@@ -14,6 +16,9 @@ interface ConfiguratorState {
   selectedProduct: ProductType;
   baseColor: string;
   logoConfig: LogoConfig;
+  cameraView: CameraView;
+  backgroundPreset: BackgroundPreset;
+  backgroundBlur: number;
   isLoading: boolean;
   
   // Actions
@@ -23,19 +28,26 @@ interface ConfiguratorState {
   setLogoPosition: (position: [number, number, number]) => void;
   setLogoScale: (scale: [number, number, number]) => void;
   setLogoRotation: (rotation: [number, number, number]) => void;
+  setCameraView: (view: CameraView) => void;
+  setBackgroundPreset: (preset: BackgroundPreset) => void;
+  setBackgroundBlur: (blur: number) => void;
   setLoading: (loading: boolean) => void;
+  resetCamera: () => void;
   resetConfiguration: () => void;
 }
 
 export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
   selectedProduct: 'tshirt',
-  baseColor: '#ffffff',
+  baseColor: '#FFFFFF',
   logoConfig: {
     image: null,
     position: [0, 0.2, 0.51],
     scale: [0.3, 0.3, 0.3],
     rotation: [0, 0, 0],
   },
+  cameraView: 'front',
+  backgroundPreset: 'studio',
+  backgroundBlur: 0,
   isLoading: false,
 
   setSelectedProduct: (product) => set({ selectedProduct: product }),
@@ -56,9 +68,16 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
     set((state) => ({
       logoConfig: { ...state.logoConfig, rotation }
     })),
+  setCameraView: (view) => set({ cameraView: view }),
+  setBackgroundPreset: (preset) => set({ backgroundPreset: preset }),
+  setBackgroundBlur: (blur) => set({ backgroundBlur: blur }),
   setLoading: (loading) => set({ isLoading: loading }),
+  resetCamera: () => set({ cameraView: 'front' }),
   resetConfiguration: () => set({
-    baseColor: '#ffffff',
+    baseColor: '#FFFFFF',
+    cameraView: 'front',
+    backgroundPreset: 'studio',
+    backgroundBlur: 0,
     logoConfig: {
       image: null,
       position: [0, 0.2, 0.51],
