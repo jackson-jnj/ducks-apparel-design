@@ -40,9 +40,6 @@ export const ApparelModel = () => {
                   rotation={logoConfig.rotation}
                   scale={logoConfig.scale}
                   map={logoTexture}
-                  transparent
-                  depthTest={false}
-                  depthWrite={false}
                 />
               )}
             </mesh>
@@ -73,9 +70,6 @@ export const ApparelModel = () => {
                   rotation={logoConfig.rotation}
                   scale={logoConfig.scale}
                   map={logoTexture}
-                  transparent
-                  depthTest={false}
-                  depthWrite={false}
                 />
               )}
             </mesh>
@@ -112,9 +106,6 @@ export const ApparelModel = () => {
                   rotation={logoConfig.rotation}
                   scale={logoConfig.scale}
                   map={logoTexture}
-                  transparent
-                  depthTest={false}
-                  depthWrite={false}
                 />
               )}
             </mesh>
