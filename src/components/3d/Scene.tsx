@@ -4,6 +4,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
 import { ImprovedApparelModel } from './ImprovedApparelModel';
 import { useConfiguratorStore } from '@/store/configuratorStore';
+import { PCFSoftShadowMap } from 'three';
 
 export const Scene = () => {
   const { backgroundPreset, backgroundBlur } = useConfiguratorStore();
@@ -37,7 +38,7 @@ export const Scene = () => {
           far: 1000
         }}
         shadows={{
-          type: 'PCFSoftShadowMap',
+          type: PCFSoftShadowMap,
           enabled: true
         }}
         dpr={[1, 2]}

@@ -2,12 +2,13 @@
 import { Button } from "./button";
 import { Slider } from "./slider";
 import { useConfiguratorStore } from "@/store/configuratorStore";
+import type { BackgroundPreset } from "@/store/configuratorStore";
 
 const backgroundPresets = [
-  { name: "Studio", value: "studio", color: "#f8f9fa" },
-  { name: "White", value: "white", color: "#ffffff" },
-  { name: "Black", value: "black", color: "#000000" },
-  { name: "Gradient", value: "gradient", color: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" },
+  { name: "Studio", value: "studio" as BackgroundPreset, color: "#f8f9fa" },
+  { name: "White", value: "white" as BackgroundPreset, color: "#ffffff" },
+  { name: "Black", value: "black" as BackgroundPreset, color: "#000000" },
+  { name: "Gradient", value: "gradient" as BackgroundPreset, color: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" },
 ];
 
 export const BackgroundControls = () => {
