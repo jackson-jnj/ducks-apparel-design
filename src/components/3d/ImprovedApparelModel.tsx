@@ -1,4 +1,3 @@
-
 import { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Decal, useGLTF, useTexture } from '@react-three/drei';
@@ -72,7 +71,7 @@ export const ImprovedApparelModel = () => {
             
             {/* Logo decal positioned on the t-shirt */}
             {logoTexture && (
-              <mesh position={cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]} transparent>
+              <mesh position={cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]}>
                 <planeGeometry args={[logoConfig.scale[0] * 2, logoConfig.scale[1] * 2]} />
                 <meshBasicMaterial map={logoTexture} transparent />
               </mesh>
