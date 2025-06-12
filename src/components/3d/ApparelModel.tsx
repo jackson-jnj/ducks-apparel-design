@@ -1,7 +1,7 @@
 
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Decal, useGLTF, useTexture } from '@react-three/drei';
+import { Decal, useTexture } from '@react-three/drei';
 import { Mesh, Group } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 
@@ -87,36 +87,6 @@ export const ApparelModel = () => {
             </mesh>
             <mesh position={[0.85, 0.2, 0]} castShadow>
               <boxGeometry args={[0.45, 1, 0.15]} />
-              <meshStandardMaterial color={baseColor} />
-            </mesh>
-          </group>
-        );
-        
-      case 'totebag':
-        return (
-          <group ref={groupRef}>
-            {/* Main bag */}
-            <mesh ref={meshRef} position={[0, -0.2, 0]} castShadow receiveShadow>
-              <boxGeometry args={[1, 1.2, 0.1]} />
-              <meshStandardMaterial color={baseColor} />
-              
-              {logoTexture && (
-                <Decal
-                  position={[0, 0.2, 0.51]}
-                  rotation={logoConfig.rotation}
-                  scale={logoConfig.scale}
-                  map={logoTexture}
-                />
-              )}
-            </mesh>
-            
-            {/* Handles */}
-            <mesh position={[-0.3, 0.6, 0]} castShadow>
-              <torusGeometry args={[0.15, 0.02, 8, 16]} />
-              <meshStandardMaterial color={baseColor} />
-            </mesh>
-            <mesh position={[0.3, 0.6, 0]} castShadow>
-              <torusGeometry args={[0.15, 0.02, 8, 16]} />
               <meshStandardMaterial color={baseColor} />
             </mesh>
           </group>
