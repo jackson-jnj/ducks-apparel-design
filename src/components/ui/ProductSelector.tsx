@@ -1,12 +1,11 @@
 
 import { Button } from "./button";
 import { useConfiguratorStore, ProductType } from "@/store/configuratorStore";
-import { Shirt, ShirtIcon as Hoodie, ShoppingBag } from "lucide-react";
+import { Shirt, ShirtIcon as Hoodie } from "lucide-react";
 
 const products: { type: ProductType; label: string; icon: React.ReactNode }[] = [
   { type: 'tshirt', label: 'T-Shirt', icon: <Shirt className="w-4 h-4" /> },
   { type: 'hoodie', label: 'Hoodie', icon: <Hoodie className="w-4 h-4" /> },
-  { type: 'totebag', label: 'Tote Bag', icon: <ShoppingBag className="w-4 h-4" /> },
 ];
 
 export const ProductSelector = () => {

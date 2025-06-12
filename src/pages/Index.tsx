@@ -19,7 +19,7 @@ const Index = () => {
               Product Studio
             </h1>
             <p className="text-sm text-muted-foreground capitalize">
-              {selectedProduct.replace('totebag', 'tote bag')} configurator
+              {selectedProduct} configurator
             </p>
           </div>
         </div>

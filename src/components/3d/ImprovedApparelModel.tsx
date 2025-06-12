@@ -1,3 +1,4 @@
+
 import { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Decal, useGLTF, useTexture } from '@react-three/drei';
@@ -15,8 +16,9 @@ export const ImprovedApparelModel = () => {
     cameraView 
   } = useConfiguratorStore();
   
-  // Load the t-shirt GLTF model
+  // Load the GLTF models
   const { scene: tshirtScene } = useGLTF('/oversized_t-shirt/scene.gltf');
+  const { scene: hoodieScene } = useGLTF('/hoodie_with_hood_up/scene.gltf');
   
   // Load logo texture if available
   const logoTexture = logoConfig.image ? useTexture(logoConfig.image) : null;
@@ -35,25 +37,18 @@ export const ImprovedApparelModel = () => {
     }
   });
 
-  // Enhanced materials with PBR properties
-  const createMaterial = () => ({
-    color: baseColor,
-    roughness: 0.8,
-    metalness: 0.1,
-    envMapIntensity: 0.5,
-  });
-
   // Apply base color to GLTF model materials
   useEffect(() => {
-    if (selectedProduct === 'tshirt' && tshirtScene) {
-      tshirtScene.traverse((child: any) => {
+    const scene = selectedProduct === 'tshirt' ? tshirtScene : hoodieScene;
+    if (scene) {
+      scene.traverse((child: any) => {
         if (child.isMesh && child.material) {
           child.material.color.set(baseColor);
           child.material.needsUpdate = true;
         }
       });
     }
-  }, [baseColor, tshirtScene, selectedProduct]);
+  }, [baseColor, tshirtScene, hoodieScene, selectedProduct]);
 
   const renderModel = () => {
     switch (selectedProduct) {
@@ -82,82 +77,22 @@ export const ImprovedApparelModel = () => {
       case 'hoodie':
         return (
           <group ref={groupRef}>
-            {/* Main body */}
-            <mesh ref={meshRef} position={[0, 0, 0]} castShadow receiveShadow>
-              <boxGeometry args={[1.3, 1.6, 0.18]} />
-              <meshStandardMaterial {...createMaterial()} />
-              
-              {logoTexture && (
-                <Decal
-                  position={cameraView === 'back' ? [0, 0.2, -0.1] : [0, 0.2, 0.1]}
-                  rotation={logoConfig.rotation}
-                  scale={logoConfig.scale}
-                  map={logoTexture}
-                />
-              )}
-            </mesh>
+            {/* GLTF Hoodie model */}
+            <primitive 
+              object={hoodieScene.clone()} 
+              scale={[1.2, 1.2, 1.2]}
+              position={[0, -1, 0]}
+              castShadow
+              receiveShadow
+            />
             
-            {/* Enhanced hood with better geometry */}
-            <mesh position={[0, 0.9, -0.1]} castShadow>
-              <sphereGeometry args={[0.45, 16, 12, 0, Math.PI]} />
-              <meshStandardMaterial {...createMaterial()} />
-            </mesh>
-            
-            {/* Hood drawstrings */}
-            <mesh position={[-0.1, 0.6, 0.1]} castShadow>
-              <cylinderGeometry args={[0.01, 0.01, 0.3, 8]} />
-              <meshStandardMaterial color="#333333" />
-            </mesh>
-            <mesh position={[0.1, 0.6, 0.1]} castShadow>
-              <cylinderGeometry args={[0.01, 0.01, 0.3, 8]} />
-              <meshStandardMaterial color="#333333" />
-            </mesh>
-            
-            {/* Sleeves */}
-            <mesh position={[-0.85, 0.2, 0]} castShadow>
-              <cylinderGeometry args={[0.22, 0.28, 1, 12]} />
-              <meshStandardMaterial {...createMaterial()} />
-            </mesh>
-            <mesh position={[0.85, 0.2, 0]} castShadow>
-              <cylinderGeometry args={[0.22, 0.28, 1, 12]} />
-              <meshStandardMaterial {...createMaterial()} />
-            </mesh>
-          </group>
-        );
-        
-      case 'totebag':
-        return (
-          <group ref={groupRef}>
-            {/* Main bag with better proportions */}
-            <mesh ref={meshRef} position={[0, -0.2, 0]} castShadow receiveShadow>
-              <boxGeometry args={[1, 1.2, 0.12]} />
-              <meshStandardMaterial {...createMaterial()} />
-              
-              {logoTexture && (
-                <Decal
-                  position={[0, 0.2, 0.07]}
-                  rotation={logoConfig.rotation}
-                  scale={logoConfig.scale}
-                  map={logoTexture}
-                />
-              )}
-            </mesh>
-            
-            {/* Enhanced handles with better geometry */}
-            <mesh position={[-0.3, 0.6, 0]} castShadow>
-              <torusGeometry args={[0.15, 0.025, 12, 24]} />
-              <meshStandardMaterial {...createMaterial()} />
-            </mesh>
-            <mesh position={[0.3, 0.6, 0]} castShadow>
-              <torusGeometry args={[0.15, 0.025, 12, 24]} />
-              <meshStandardMaterial {...createMaterial()} />
-            </mesh>
-            
-            {/* Bottom reinforcement */}
-            <mesh position={[0, -0.8, 0]} castShadow>
-              <boxGeometry args={[1, 0.05, 0.12]} />
-              <meshStandardMaterial color="#666666" />
-            </mesh>
+            {/* Logo decal positioned on the hoodie */}
+            {logoTexture && (
+              <mesh position={cameraView === 'back' ? [0, 0.1, -0.2] : [0, 0.1, 0.2]}>
+                <planeGeometry args={[logoConfig.scale[0] * 2, logoConfig.scale[1] * 2]} />
+                <meshBasicMaterial map={logoTexture} transparent />
+              </mesh>
+            )}
           </group>
         );
         
@@ -169,5 +104,6 @@ export const ImprovedApparelModel = () => {
   return renderModel();
 };
 
-// Preload the GLTF model
+// Preload the GLTF models
 useGLTF.preload('/oversized_t-shirt/scene.gltf');
+useGLTF.preload('/hoodie_with_hood_up/scene.gltf');
