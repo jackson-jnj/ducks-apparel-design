@@ -1,0 +1,11 @@
+Model Information:
+* title:	Hoodie with hood up
+* source:	https://sketchfab.com/3d-models/hoodie-with-hood-up-237449b193714dfaa13b9a4d9d2b9a90
+* author:	chop24 (https://sketchfab.com/chop24)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Hoodie with hood up" (https://sketchfab.com/3d-models/hoodie-with-hood-up-237449b193714dfaa13b9a4d9d2b9a90) by chop24 (https://sketchfab.com/chop24) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
