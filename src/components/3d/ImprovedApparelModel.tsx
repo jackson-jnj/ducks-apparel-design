@@ -16,6 +16,9 @@ export const ImprovedApparelModel = () => {
     cameraView 
   } = useConfiguratorStore();
   
+  // Load the t-shirt GLTF model
+  const { scene: tshirtScene } = useGLTF('/oversized_t-shirt/scene.gltf');
+  
   // Load logo texture if available
   const logoTexture = logoConfig.image ? useTexture(logoConfig.image) : null;
 
@@ -41,42 +44,39 @@ export const ImprovedApparelModel = () => {
     envMapIntensity: 0.5,
   });
 
+  // Apply base color to GLTF model materials
+  useEffect(() => {
+    if (selectedProduct === 'tshirt' && tshirtScene) {
+      tshirtScene.traverse((child: any) => {
+        if (child.isMesh && child.material) {
+          child.material.color.set(baseColor);
+          child.material.needsUpdate = true;
+        }
+      });
+    }
+  }, [baseColor, tshirtScene, selectedProduct]);
+
   const renderModel = () => {
     switch (selectedProduct) {
       case 'tshirt':
         return (
           <group ref={groupRef}>
-            {/* Main body with enhanced geometry */}
-            <mesh ref={meshRef} position={[0, 0, 0]} castShadow receiveShadow>
-              <boxGeometry args={[1.2, 1.5, 0.15]} />
-              <meshStandardMaterial {...createMaterial()} />
-              
-              {/* Logo decal */}
-              {logoTexture && (
-                <Decal
-                  position={cameraView === 'back' ? [0, 0.2, -0.08] : [0, 0.2, 0.08]}
-                  rotation={logoConfig.rotation}
-                  scale={logoConfig.scale}
-                  map={logoTexture}
-                />
-              )}
-            </mesh>
+            {/* GLTF T-shirt model */}
+            <primitive 
+              object={tshirtScene.clone()} 
+              scale={[1.5, 1.5, 1.5]}
+              position={[0, -1, 0]}
+              castShadow
+              receiveShadow
+            />
             
-            {/* Enhanced sleeves with rounded geometry */}
-            <mesh position={[-0.8, 0.3, 0]} castShadow>
-              <cylinderGeometry args={[0.2, 0.25, 0.8, 12]} />
-              <meshStandardMaterial {...createMaterial()} />
-            </mesh>
-            <mesh position={[0.8, 0.3, 0]} castShadow>
-              <cylinderGeometry args={[0.2, 0.25, 0.8, 12]} />
-              <meshStandardMaterial {...createMaterial()} />
-            </mesh>
-            
-            {/* Collar detail */}
-            <mesh position={[0, 0.7, 0]} castShadow>
-              <torusGeometry args={[0.35, 0.03, 8, 20]} />
-              <meshStandardMaterial {...createMaterial()} />
-            </mesh>
+            {/* Logo decal positioned on the t-shirt */}
+            {logoTexture && (
+              <mesh position={cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]} transparent>
+                <planeGeometry args={[logoConfig.scale[0] * 2, logoConfig.scale[1] * 2]} />
+                <meshBasicMaterial map={logoTexture} transparent />
+              </mesh>
+            )}
           </group>
         );
         
@@ -169,3 +169,6 @@ export const ImprovedApparelModel = () => {
 
   return renderModel();
 };
+
+// Preload the GLTF model
+useGLTF.preload('/oversized_t-shirt/scene.gltf');
