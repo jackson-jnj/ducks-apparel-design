@@ -126,7 +126,7 @@ const ColorPickerModal = ({ isOpen, onClose }: ColorPickerModalProps) => {
 };
 
 export const ModernColorPicker = () => {
-  const { baseColor } = useConfiguratorStore();
+  const { baseColor, setBaseColor } = useConfiguratorStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const presetColors = [

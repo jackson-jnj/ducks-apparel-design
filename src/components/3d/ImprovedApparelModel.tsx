@@ -72,37 +72,37 @@ export const ImprovedApparelModel = () => {
       case 'short-sleeve-tshirt':
         return {
           scene: shortSleeveTshirtScene,
-          scale: [1.5, 1.5, 1.5],
-          position: [0, -1, 0],
-          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]
+          scale: [1.5, 1.5, 1.5] as [number, number, number],
+          position: [0, -1, 0] as [number, number, number],
+          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] as [number, number, number] : [0, 0.2, 0.3] as [number, number, number]
         };
       case 'long-sleeve-tshirt':
         return {
           scene: longSleeveTshirtScene,
-          scale: [1.5, 1.5, 1.5],
-          position: [0, -1, 0],
-          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]
+          scale: [1.5, 1.5, 1.5] as [number, number, number],
+          position: [0, -1, 0] as [number, number, number],
+          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] as [number, number, number] : [0, 0.2, 0.3] as [number, number, number]
         };
       case 'short-sleeve-polo':
         return {
           scene: shortSleeveTshirtScene, // Using same model for polo temporarily
-          scale: [1.5, 1.5, 1.5],
-          position: [0, -1, 0],
-          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]
+          scale: [1.5, 1.5, 1.5] as [number, number, number],
+          position: [0, -1, 0] as [number, number, number],
+          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] as [number, number, number] : [0, 0.2, 0.3] as [number, number, number]
         };
       case 'hoodie':
         return {
           scene: hoodieScene,
-          scale: [1.2, 1.2, 1.2],
-          position: [0, -1, 0],
-          logoPosition: cameraView === 'back' ? [0, 0.1, -0.2] : [0, 0.1, 0.2]
+          scale: [1.2, 1.2, 1.2] as [number, number, number],
+          position: [0, -1, 0] as [number, number, number],
+          logoPosition: cameraView === 'back' ? [0, 0.1, -0.2] as [number, number, number] : [0, 0.1, 0.2] as [number, number, number]
         };
       default:
         return {
           scene: shortSleeveTshirtScene,
-          scale: [1.5, 1.5, 1.5],
-          position: [0, -1, 0],
-          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]
+          scale: [1.5, 1.5, 1.5] as [number, number, number],
+          position: [0, -1, 0] as [number, number, number],
+          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] as [number, number, number] : [0, 0.2, 0.3] as [number, number, number]
         };
     }
   };

@@ -4,7 +4,9 @@ import { useConfiguratorStore, ProductType } from "@/store/configuratorStore";
 import { Shirt, ShirtIcon as Hoodie } from "lucide-react";
 
 const products: { type: ProductType; label: string; icon: React.ReactNode }[] = [
-  { type: 'tshirt', label: 'T-Shirt', icon: <Shirt className="w-4 h-4" /> },
+  { type: 'short-sleeve-tshirt', label: 'Short Sleeve T-Shirt', icon: <Shirt className="w-4 h-4" /> },
+  { type: 'long-sleeve-tshirt', label: 'Long Sleeve T-Shirt', icon: <Shirt className="w-4 h-4" /> },
+  { type: 'short-sleeve-polo', label: 'Short Sleeve Polo', icon: <Shirt className="w-4 h-4" /> },
   { type: 'hoodie', label: 'Hoodie', icon: <Hoodie className="w-4 h-4" /> },
 ];
 
