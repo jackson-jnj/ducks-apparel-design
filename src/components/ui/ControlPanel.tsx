@@ -1,6 +1,6 @@
 
 import { ProductSelector } from "./ProductSelector";
-import { ColorStrip } from "./ColorStrip";
+import { ModernColorPicker } from "./ModernColorPicker";
 import { ViewControls } from "./ViewControls";
 import { BackgroundControls } from "./BackgroundControls";
 import { LogoUploader } from "./LogoUploader";
@@ -20,7 +20,7 @@ export const ControlPanel = () => {
         <div className="space-y-4">
           <ProductSelector />
           <Separator />
-          <ColorStrip />
+          <ModernColorPicker />
           <Separator />
           <ViewControls />
           <Separator />

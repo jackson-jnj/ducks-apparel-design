@@ -1,13 +1,12 @@
 
 import { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Decal, useGLTF, useTexture } from '@react-three/drei';
-import { Mesh, Group, Vector3 } from 'three';
+import { useGLTF, useTexture } from '@react-three/drei';
+import { Mesh, Group } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 
 export const ImprovedApparelModel = () => {
   const groupRef = useRef<Group>(null);
-  const meshRef = useRef<Mesh>(null);
   
   const { 
     selectedProduct, 
@@ -16,8 +15,9 @@ export const ImprovedApparelModel = () => {
     cameraView 
   } = useConfiguratorStore();
   
-  // Load the GLTF models
-  const { scene: tshirtScene } = useGLTF('/oversized_t-shirt/scene.gltf');
+  // Load all GLTF models
+  const { scene: shortSleeveTshirtScene } = useGLTF('/oversized_t-shirt/scene.gltf');
+  const { scene: longSleeveTshirtScene } = useGLTF('/long_sleeve_t-_shirt/scene.gltf');
   const { scene: hoodieScene } = useGLTF('/hoodie_with_hood_up/scene.gltf');
   
   // Load logo texture if available
@@ -39,7 +39,24 @@ export const ImprovedApparelModel = () => {
 
   // Apply base color to GLTF model materials
   useEffect(() => {
-    const scene = selectedProduct === 'tshirt' ? tshirtScene : hoodieScene;
+    let scene;
+    switch (selectedProduct) {
+      case 'short-sleeve-tshirt':
+        scene = shortSleeveTshirtScene;
+        break;
+      case 'long-sleeve-tshirt':
+        scene = longSleeveTshirtScene;
+        break;
+      case 'short-sleeve-polo':
+        scene = shortSleeveTshirtScene; // Using same model for polo temporarily
+        break;
+      case 'hoodie':
+        scene = hoodieScene;
+        break;
+      default:
+        scene = shortSleeveTshirtScene;
+    }
+    
     if (scene) {
       scene.traverse((child: any) => {
         if (child.isMesh && child.material) {
@@ -48,62 +65,73 @@ export const ImprovedApparelModel = () => {
         }
       });
     }
-  }, [baseColor, tshirtScene, hoodieScene, selectedProduct]);
+  }, [baseColor, shortSleeveTshirtScene, longSleeveTshirtScene, hoodieScene, selectedProduct]);
 
-  const renderModel = () => {
+  const getModelConfig = () => {
     switch (selectedProduct) {
-      case 'tshirt':
-        return (
-          <group ref={groupRef}>
-            {/* GLTF T-shirt model */}
-            <primitive 
-              object={tshirtScene.clone()} 
-              scale={[1.5, 1.5, 1.5]}
-              position={[0, -1, 0]}
-              castShadow
-              receiveShadow
-            />
-            
-            {/* Logo decal positioned on the t-shirt */}
-            {logoTexture && (
-              <mesh position={cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]}>
-                <planeGeometry args={[logoConfig.scale[0] * 2, logoConfig.scale[1] * 2]} />
-                <meshBasicMaterial map={logoTexture} transparent />
-              </mesh>
-            )}
-          </group>
-        );
-        
+      case 'short-sleeve-tshirt':
+        return {
+          scene: shortSleeveTshirtScene,
+          scale: [1.5, 1.5, 1.5],
+          position: [0, -1, 0],
+          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]
+        };
+      case 'long-sleeve-tshirt':
+        return {
+          scene: longSleeveTshirtScene,
+          scale: [1.5, 1.5, 1.5],
+          position: [0, -1, 0],
+          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]
+        };
+      case 'short-sleeve-polo':
+        return {
+          scene: shortSleeveTshirtScene, // Using same model for polo temporarily
+          scale: [1.5, 1.5, 1.5],
+          position: [0, -1, 0],
+          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]
+        };
       case 'hoodie':
-        return (
-          <group ref={groupRef}>
-            {/* GLTF Hoodie model */}
-            <primitive 
-              object={hoodieScene.clone()} 
-              scale={[1.2, 1.2, 1.2]}
-              position={[0, -1, 0]}
-              castShadow
-              receiveShadow
-            />
-            
-            {/* Logo decal positioned on the hoodie */}
-            {logoTexture && (
-              <mesh position={cameraView === 'back' ? [0, 0.1, -0.2] : [0, 0.1, 0.2]}>
-                <planeGeometry args={[logoConfig.scale[0] * 2, logoConfig.scale[1] * 2]} />
-                <meshBasicMaterial map={logoTexture} transparent />
-              </mesh>
-            )}
-          </group>
-        );
-        
+        return {
+          scene: hoodieScene,
+          scale: [1.2, 1.2, 1.2],
+          position: [0, -1, 0],
+          logoPosition: cameraView === 'back' ? [0, 0.1, -0.2] : [0, 0.1, 0.2]
+        };
       default:
-        return null;
+        return {
+          scene: shortSleeveTshirtScene,
+          scale: [1.5, 1.5, 1.5],
+          position: [0, -1, 0],
+          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]
+        };
     }
   };
 
-  return renderModel();
+  const modelConfig = getModelConfig();
+
+  return (
+    <group ref={groupRef}>
+      {/* GLTF Model */}
+      <primitive 
+        object={modelConfig.scene.clone()} 
+        scale={modelConfig.scale}
+        position={modelConfig.position}
+        castShadow
+        receiveShadow
+      />
+      
+      {/* Logo decal */}
+      {logoTexture && (
+        <mesh position={modelConfig.logoPosition}>
+          <planeGeometry args={[logoConfig.scale[0] * 2, logoConfig.scale[1] * 2]} />
+          <meshBasicMaterial map={logoTexture} transparent />
+        </mesh>
+      )}
+    </group>
+  );
 };
 
-// Preload the GLTF models
+// Preload all GLTF models
 useGLTF.preload('/oversized_t-shirt/scene.gltf');
+useGLTF.preload('/long_sleeve_t-_shirt/scene.gltf');
 useGLTF.preload('/hoodie_with_hood_up/scene.gltf');
