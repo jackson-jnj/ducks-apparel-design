@@ -23,17 +23,17 @@ export const Scene = () => {
     switch (backgroundPreset) {
       case 'white': return '#ffffff';
       case 'black': return '#000000';
-      case 'gradient': return '#f3f4f6';
+      case 'gradient': return '#667eea';
       default: return '#f8f9fa';
     }
   };
 
   return (
-    <div className="w-full h-full relative bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="w-full h-full relative">
       <Canvas
         camera={{ 
-          position: [0, 0, 4], 
-          fov: 50,
+          position: [0, 0, 5], 
+          fov: 45,
           near: 0.1,
           far: 1000
         }}
@@ -44,14 +44,15 @@ export const Scene = () => {
         dpr={[1, 2]}
         style={{
           background: getBackgroundColor(),
+          filter: `blur(${backgroundBlur * 0.01}px)`
         }}
       >
         <Suspense fallback={null}>
           {/* Enhanced lighting setup */}
-          <ambientLight intensity={0.6} />
+          <ambientLight intensity={0.4} />
           <directionalLight
             position={[10, 10, 5]}
-            intensity={1.5}
+            intensity={1.2}
             castShadow
             shadow-mapSize-width={2048}
             shadow-mapSize-height={2048}
@@ -65,15 +66,15 @@ export const Scene = () => {
           {/* Fill light */}
           <directionalLight
             position={[-5, 5, -5]}
-            intensity={0.4}
+            intensity={0.3}
             color="#ffffff"
           />
           
           {/* Rim light */}
           <directionalLight
             position={[0, 0, -10]}
-            intensity={0.6}
-            color="#e0e7ff"
+            intensity={0.5}
+            color="#4f94ff"
           />
 
           {/* Environment lighting */}
@@ -90,11 +91,11 @@ export const Scene = () => {
           <ContactShadows
             rotation-x={Math.PI / 2}
             position={[0, -1.5, 0]}
-            opacity={0.3}
-            width={6}
-            height={6}
-            blur={2.5}
-            far={3}
+            opacity={0.2}
+            width={5}
+            height={5}
+            blur={2}
+            far={2.5}
           />
 
           {/* Enhanced orbit controls */}
@@ -102,15 +103,13 @@ export const Scene = () => {
             enablePan={false}
             enableZoom={true}
             enableRotate={true}
-            minDistance={2.5}
+            minDistance={3}
             maxDistance={8}
             minPolarAngle={Math.PI / 6}
             maxPolarAngle={Math.PI - Math.PI / 6}
             target={[0, 0, 0]}
             autoRotate={false}
-            autoRotateSpeed={0.8}
-            dampingFactor={0.05}
-            enableDamping={true}
+            autoRotateSpeed={0.5}
           />
         </Suspense>
       </Canvas>

@@ -25,9 +25,7 @@ export const ApparelModel = () => {
   // In a real app, you'd load actual .glb models here
   const renderModel = () => {
     switch (selectedProduct) {
-      case 'short-sleeve-tshirt':
-      case 'long-sleeve-tshirt':
-      case 'short-sleeve-polo':
+      case 'tshirt':
         return (
           <group ref={groupRef}>
             {/* Main body */}
