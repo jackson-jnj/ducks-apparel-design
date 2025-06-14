@@ -6,18 +6,38 @@ import { Mesh, Group } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 import { ApparelModel } from './ApparelModel';
 
-// Model paths organized for better loading
+// Updated model paths with new models
 const MODEL_PATHS = {
   'short-sleeve-tshirt': '/oversized_t-shirt/scene.gltf',
-  'long-sleeve-tshirt': '/long_sleeve_t-_shirt/scene.gltf',
-  'short-sleeve-polo': '/oversized_t-shirt/scene.gltf', // Using same model for polo
+  'long-sleeve-tshirt': '/long_sleeve_shirt/scene.gltf',
+  'short-sleeve-polo': '/short_sleeve_polo/short_sleeve_polo/scene.gltf',
   'hoodie': '/hoodie_with_hood_up/scene.gltf',
 } as const;
+
+// Preload all models for faster switching
+const preloadedModels = new Map();
+let isPreloading = false;
+
+const preloadAllModels = async () => {
+  if (isPreloading) return;
+  isPreloading = true;
+  
+  for (const [productType, modelPath] of Object.entries(MODEL_PATHS)) {
+    try {
+      const gltf = await useGLTF.preload(modelPath);
+      preloadedModels.set(productType, gltf);
+      console.log(`Preloaded model: ${productType}`);
+    } catch (error) {
+      console.warn(`Failed to preload model ${productType}:`, error);
+    }
+  }
+};
 
 export const ImprovedApparelModel = () => {
   const groupRef = useRef<Group>(null);
   const [currentModel, setCurrentModel] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [modelCache, setModelCache] = useState(new Map());
   
   const { 
     selectedProduct, 
@@ -26,39 +46,59 @@ export const ImprovedApparelModel = () => {
     cameraView 
   } = useConfiguratorStore();
   
-  // Load the current model based on selected product
-  const modelPath = MODEL_PATHS[selectedProduct];
-  
-  // Load GLTF model with error handling
-  let gltfData;
-  try {
-    gltfData = useGLTF(modelPath);
-  } catch (error) {
-    console.warn(`Failed to load model at ${modelPath}:`, error);
-    gltfData = null;
-  }
-  
-  // Load logo texture if available
+  // Preload models on component mount
+  useEffect(() => {
+    preloadAllModels();
+  }, []);
+
+  // Fast model switching with caching
+  useEffect(() => {
+    const loadModel = async () => {
+      setIsLoading(true);
+      
+      // Check cache first
+      if (modelCache.has(selectedProduct)) {
+        const cachedModel = modelCache.get(selectedProduct);
+        setCurrentModel(cachedModel.scene.clone());
+        setIsLoading(false);
+        return;
+      }
+
+      // Load from preloaded models or fresh load
+      try {
+        const modelPath = MODEL_PATHS[selectedProduct];
+        let gltfData = preloadedModels.get(selectedProduct);
+        
+        if (!gltfData) {
+          gltfData = await useGLTF(modelPath);
+        }
+        
+        if (gltfData?.scene) {
+          // Cache the model for instant switching
+          setModelCache(prev => new Map(prev).set(selectedProduct, gltfData));
+          setCurrentModel(gltfData.scene.clone());
+        }
+      } catch (error) {
+        console.warn(`Failed to load model for ${selectedProduct}:`, error);
+        setCurrentModel(null);
+      }
+      
+      setIsLoading(false);
+    };
+
+    loadModel();
+  }, [selectedProduct, modelCache]);
+
+  // Logo texture loading
   const logoTexture = logoConfig.image ? useTexture(logoConfig.image) : null;
 
-  // Update current model when GLTF data changes
-  useEffect(() => {
-    if (gltfData?.scene) {
-      setCurrentModel(gltfData.scene.clone());
-      setIsLoading(false);
-    } else {
-      setCurrentModel(null);
-      setIsLoading(true);
-    }
-  }, [gltfData, selectedProduct]);
-
-  // Animation frame
+  // Animation frame with optimized performance
   useFrame((state) => {
-    if (groupRef.current) {
+    if (groupRef.current && !isLoading) {
       // Subtle breathing animation
       groupRef.current.scale.setScalar(1 + Math.sin(state.clock.elapsedTime * 0.5) * 0.02);
       
-      // Auto-rotate based on camera view
+      // Smooth camera view rotation
       const targetRotation = cameraView === 'back' ? Math.PI : 
                            cameraView === 'side' ? Math.PI / 2 : 0;
       
@@ -66,11 +106,16 @@ export const ImprovedApparelModel = () => {
     }
   });
 
-  // Apply base color to model materials
+  // Apply base color with optimized material updates
   useEffect(() => {
     if (currentModel) {
       currentModel.traverse((child: any) => {
         if (child.isMesh && child.material) {
+          // Clone material to avoid affecting other instances
+          if (!child.material.userData.originalColor) {
+            child.material = child.material.clone();
+            child.material.userData.originalColor = child.material.color.getHex();
+          }
           child.material.color.set(baseColor);
           child.material.needsUpdate = true;
         }
@@ -91,6 +136,18 @@ export const ImprovedApparelModel = () => {
           position: [0, -1.2, 0] as [number, number, number],
           logoPosition: cameraView === 'back' ? [0, 0.1, -0.2] as [number, number, number] : [0, 0.1, 0.2] as [number, number, number]
         };
+      case 'short-sleeve-polo':
+        return {
+          scale: [0.01, 0.01, 0.01] as [number, number, number],
+          position: [0, -1.2, 0] as [number, number, number],
+          logoPosition: cameraView === 'back' ? [0, 0.1, -0.2] as [number, number, number] : [0, 0.1, 0.2] as [number, number, number]
+        };
+      case 'long-sleeve-tshirt':
+        return {
+          scale: [0.01, 0.01, 0.01] as [number, number, number],
+          position: [0, -1.2, 0] as [number, number, number],
+          logoPosition: cameraView === 'back' ? [0, 0.1, -0.2] as [number, number, number] : [0, 0.1, 0.2] as [number, number, number]
+        };
       default:
         return {
           scale: [1.8, 1.8, 1.8] as [number, number, number],
@@ -104,7 +161,7 @@ export const ImprovedApparelModel = () => {
 
   return (
     <group ref={groupRef}>
-      {/* GLTF Model */}
+      {/* GLTF Model with optimized rendering */}
       <primitive 
         object={currentModel} 
         scale={modelConfig.scale}
@@ -124,11 +181,7 @@ export const ImprovedApparelModel = () => {
   );
 };
 
-// Preload models for better performance
-Object.values(MODEL_PATHS).forEach(path => {
-  try {
-    useGLTF.preload(path);
-  } catch (error) {
-    console.warn(`Failed to preload model at ${path}`);
-  }
-});
+// Clean up function for performance
+export const clearModelCache = () => {
+  preloadedModels.clear();
+};
