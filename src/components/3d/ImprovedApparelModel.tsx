@@ -1,12 +1,13 @@
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF, useTexture } from '@react-three/drei';
-import { Mesh, Group } from 'three';
+import { Mesh, Group, Vector3 } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 
 export const ImprovedApparelModel = () => {
   const groupRef = useRef<Group>(null);
+  const [modelLoadError, setModelLoadError] = useState<string | null>(null);
   
   const { 
     selectedProduct, 
@@ -15,13 +16,20 @@ export const ImprovedApparelModel = () => {
     cameraView 
   } = useConfiguratorStore();
   
-  // Load all GLTF models
-  const { scene: shortSleeveTshirtScene } = useGLTF('/oversized_t-shirt/scene.gltf');
-  const { scene: longSleeveTshirtScene } = useGLTF('/long_sleeve_t-_shirt/scene.gltf');
-  const { scene: hoodieScene } = useGLTF('/hoodie_with_hood_up/scene.gltf');
+  // Load GLTF models with error handling
+  const { scene: tshirtScene, error: tshirtError } = useGLTF('/oversized_t-shirt/scene.gltf');
+  const { scene: hoodieScene, error: hoodieError } = useGLTF('/hoodie_with_hood_up/scene.gltf');
   
   // Load logo texture if available
   const logoTexture = logoConfig.image ? useTexture(logoConfig.image) : null;
+
+  // Handle loading errors
+  useEffect(() => {
+    if (tshirtError || hoodieError) {
+      console.error('Model loading error:', tshirtError || hoodieError);
+      setModelLoadError('Failed to load 3D model');
+    }
+  }, [tshirtError, hoodieError]);
 
   // Camera position animation based on view
   useFrame((state) => {
@@ -39,23 +47,7 @@ export const ImprovedApparelModel = () => {
 
   // Apply base color to GLTF model materials
   useEffect(() => {
-    let scene;
-    switch (selectedProduct) {
-      case 'short-sleeve-tshirt':
-        scene = shortSleeveTshirtScene;
-        break;
-      case 'long-sleeve-tshirt':
-        scene = longSleeveTshirtScene;
-        break;
-      case 'short-sleeve-polo':
-        scene = shortSleeveTshirtScene; // Using same model for polo temporarily
-        break;
-      case 'hoodie':
-        scene = hoodieScene;
-        break;
-      default:
-        scene = shortSleeveTshirtScene;
-    }
+    const scene = selectedProduct === 'hoodie' ? hoodieScene : tshirtScene;
     
     if (scene) {
       scene.traverse((child: any) => {
@@ -65,49 +57,52 @@ export const ImprovedApparelModel = () => {
         }
       });
     }
-  }, [baseColor, shortSleeveTshirtScene, longSleeveTshirtScene, hoodieScene, selectedProduct]);
+  }, [baseColor, tshirtScene, hoodieScene, selectedProduct]);
 
   const getModelConfig = () => {
     switch (selectedProduct) {
-      case 'short-sleeve-tshirt':
+      case 'tshirt':
         return {
-          scene: shortSleeveTshirtScene,
-          scale: [1.5, 1.5, 1.5],
-          position: [0, -1, 0],
-          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]
-        };
-      case 'long-sleeve-tshirt':
-        return {
-          scene: longSleeveTshirtScene,
-          scale: [1.5, 1.5, 1.5],
-          position: [0, -1, 0],
-          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]
-        };
-      case 'short-sleeve-polo':
-        return {
-          scene: shortSleeveTshirtScene, // Using same model for polo temporarily
-          scale: [1.5, 1.5, 1.5],
-          position: [0, -1, 0],
-          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]
+          scene: tshirtScene,
+          scale: new Vector3(1.5, 1.5, 1.5),
+          position: new Vector3(0, -1, 0),
+          logoPosition: cameraView === 'back' ? new Vector3(0, 0.2, -0.3) : new Vector3(0, 0.2, 0.3)
         };
       case 'hoodie':
         return {
           scene: hoodieScene,
-          scale: [1.2, 1.2, 1.2],
-          position: [0, -1, 0],
-          logoPosition: cameraView === 'back' ? [0, 0.1, -0.2] : [0, 0.1, 0.2]
+          scale: new Vector3(1.2, 1.2, 1.2),
+          position: new Vector3(0, -1, 0),
+          logoPosition: cameraView === 'back' ? new Vector3(0, 0.1, -0.2) : new Vector3(0, 0.1, 0.2)
         };
       default:
         return {
-          scene: shortSleeveTshirtScene,
-          scale: [1.5, 1.5, 1.5],
-          position: [0, -1, 0],
-          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] : [0, 0.2, 0.3]
+          scene: tshirtScene,
+          scale: new Vector3(1.5, 1.5, 1.5),
+          position: new Vector3(0, -1, 0),
+          logoPosition: cameraView === 'back' ? new Vector3(0, 0.2, -0.3) : new Vector3(0, 0.2, 0.3)
         };
     }
   };
 
   const modelConfig = getModelConfig();
+
+  // Show error message if models failed to load
+  if (modelLoadError) {
+    return (
+      <group>
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry args={[2, 3, 0.5]} />
+          <meshBasicMaterial color="#ff6b6b" />
+        </mesh>
+      </group>
+    );
+  }
+
+  // Don't render if no scene is available
+  if (!modelConfig.scene) {
+    return null;
+  }
 
   return (
     <group ref={groupRef}>
@@ -131,7 +126,6 @@ export const ImprovedApparelModel = () => {
   );
 };
 
-// Preload all GLTF models
+// Preload available GLTF models
 useGLTF.preload('/oversized_t-shirt/scene.gltf');
-useGLTF.preload('/long_sleeve_t-_shirt/scene.gltf');
 useGLTF.preload('/hoodie_with_hood_up/scene.gltf');

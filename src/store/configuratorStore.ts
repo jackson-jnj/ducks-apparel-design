@@ -1,7 +1,7 @@
 
 import { create } from 'zustand';
 
-export type ProductType = 'short-sleeve-tshirt' | 'long-sleeve-tshirt' | 'short-sleeve-polo' | 'hoodie';
+export type ProductType = 'tshirt' | 'hoodie';
 export type CameraView = 'front' | 'back' | 'side';
 export type BackgroundPreset = 'studio' | 'white' | 'black' | 'gradient';
 
@@ -37,7 +37,7 @@ interface ConfiguratorState {
 }
 
 export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
-  selectedProduct: 'short-sleeve-tshirt',
+  selectedProduct: 'tshirt',
   baseColor: '#FFFFFF',
   logoConfig: {
     image: null,
