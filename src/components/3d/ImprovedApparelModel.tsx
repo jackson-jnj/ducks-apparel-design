@@ -1,4 +1,3 @@
-
 import { useRef, useEffect, useState, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF, useTexture } from '@react-three/drei';
@@ -125,10 +124,7 @@ const ModelWithFallback = ({ productType }: { productType: keyof typeof MODEL_PA
 
   return (
     <Suspense fallback={<ApparelModel />}>
-      <ModelLoader 
-        productType={productType}
-        onError={() => setHasError(true)}
-      />
+      <ModelLoader productType={productType} />
     </Suspense>
   );
 };
