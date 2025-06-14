@@ -16,20 +16,27 @@ export const ImprovedApparelModel = () => {
     cameraView 
   } = useConfiguratorStore();
   
-  // Load GLTF models with error handling
-  const { scene: tshirtScene, error: tshirtError } = useGLTF('/oversized_t-shirt/scene.gltf');
-  const { scene: hoodieScene, error: hoodieError } = useGLTF('/hoodie_with_hood_up/scene.gltf');
+  // Load GLTF models with proper error handling
+  let tshirtScene, hoodieScene;
+  
+  try {
+    const tshirtGltf = useGLTF('/oversized_t-shirt/scene.gltf');
+    tshirtScene = tshirtGltf.scene;
+  } catch (error) {
+    console.error('T-shirt model loading error:', error);
+    setModelLoadError('Failed to load T-shirt model');
+  }
+  
+  try {
+    const hoodieGltf = useGLTF('/hoodie_with_hood_up/scene.gltf');
+    hoodieScene = hoodieGltf.scene;
+  } catch (error) {
+    console.error('Hoodie model loading error:', error);
+    setModelLoadError('Failed to load hoodie model');
+  }
   
   // Load logo texture if available
   const logoTexture = logoConfig.image ? useTexture(logoConfig.image) : null;
-
-  // Handle loading errors
-  useEffect(() => {
-    if (tshirtError || hoodieError) {
-      console.error('Model loading error:', tshirtError || hoodieError);
-      setModelLoadError('Failed to load 3D model');
-    }
-  }, [tshirtError, hoodieError]);
 
   // Camera position animation based on view
   useFrame((state) => {
