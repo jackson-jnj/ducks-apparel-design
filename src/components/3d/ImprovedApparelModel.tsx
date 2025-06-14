@@ -6,9 +6,18 @@ import { Mesh, Group } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 import { ApparelModel } from './ApparelModel';
 
+// Model paths organized for better loading
+const MODEL_PATHS = {
+  'short-sleeve-tshirt': '/oversized_t-shirt/scene.gltf',
+  'long-sleeve-tshirt': '/long_sleeve_t-_shirt/scene.gltf',
+  'short-sleeve-polo': '/oversized_t-shirt/scene.gltf', // Using same model for polo
+  'hoodie': '/hoodie_with_hood_up/scene.gltf',
+} as const;
+
 export const ImprovedApparelModel = () => {
   const groupRef = useRef<Group>(null);
-  const [modelsLoaded, setModelsLoaded] = useState(false);
+  const [currentModel, setCurrentModel] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   const { 
     selectedProduct, 
@@ -17,39 +26,31 @@ export const ImprovedApparelModel = () => {
     cameraView 
   } = useConfiguratorStore();
   
-  // Try to load GLTF models with error handling
-  let shortSleeveTshirtScene, longSleeveTshirtScene, hoodieScene;
+  // Load the current model based on selected product
+  const modelPath = MODEL_PATHS[selectedProduct];
   
+  // Load GLTF model with error handling
+  let gltfData;
   try {
-    const shortSleeveGLTF = useGLTF('/oversized_t-shirt/scene.gltf');
-    shortSleeveTshirtScene = shortSleeveGLTF.scene;
+    gltfData = useGLTF(modelPath);
   } catch (error) {
-    console.warn('Failed to load short sleeve t-shirt model:', error);
-  }
-  
-  try {
-    const longSleeveGLTF = useGLTF('/long_sleeve_t-_shirt/scene.gltf');
-    longSleeveTshirtScene = longSleeveGLTF.scene;
-  } catch (error) {
-    console.warn('Failed to load long sleeve t-shirt model:', error);
-  }
-  
-  try {
-    const hoodieGLTF = useGLTF('/hoodie_with_hood_up/scene.gltf');
-    hoodieScene = hoodieGLTF.scene;
-  } catch (error) {
-    console.warn('Failed to load hoodie model:', error);
+    console.warn(`Failed to load model at ${modelPath}:`, error);
+    gltfData = null;
   }
   
   // Load logo texture if available
   const logoTexture = logoConfig.image ? useTexture(logoConfig.image) : null;
 
-  // Check if at least one model is loaded
+  // Update current model when GLTF data changes
   useEffect(() => {
-    if (shortSleeveTshirtScene || longSleeveTshirtScene || hoodieScene) {
-      setModelsLoaded(true);
+    if (gltfData?.scene) {
+      setCurrentModel(gltfData.scene.clone());
+      setIsLoading(false);
+    } else {
+      setCurrentModel(null);
+      setIsLoading(true);
     }
-  }, [shortSleeveTshirtScene, longSleeveTshirtScene, hoodieScene]);
+  }, [gltfData, selectedProduct]);
 
   // Animation frame
   useFrame((state) => {
@@ -65,74 +66,33 @@ export const ImprovedApparelModel = () => {
     }
   });
 
-  // Apply base color to GLTF model materials
+  // Apply base color to model materials
   useEffect(() => {
-    let scene;
-    switch (selectedProduct) {
-      case 'short-sleeve-tshirt':
-        scene = shortSleeveTshirtScene;
-        break;
-      case 'long-sleeve-tshirt':
-        scene = longSleeveTshirtScene;
-        break;
-      case 'short-sleeve-polo':
-        scene = shortSleeveTshirtScene; // Using same model for polo temporarily
-        break;
-      case 'hoodie':
-        scene = hoodieScene;
-        break;
-      default:
-        scene = shortSleeveTshirtScene;
-    }
-    
-    if (scene) {
-      scene.traverse((child: any) => {
+    if (currentModel) {
+      currentModel.traverse((child: any) => {
         if (child.isMesh && child.material) {
           child.material.color.set(baseColor);
           child.material.needsUpdate = true;
         }
       });
     }
-  }, [baseColor, shortSleeveTshirtScene, longSleeveTshirtScene, hoodieScene, selectedProduct]);
+  }, [baseColor, currentModel]);
 
-  // If no GLTF models are loaded, use fallback geometric model
-  if (!modelsLoaded) {
+  // If model is loading or failed to load, use fallback
+  if (isLoading || !currentModel) {
     return <ApparelModel />;
   }
 
   const getModelConfig = () => {
     switch (selectedProduct) {
-      case 'short-sleeve-tshirt':
-        return {
-          scene: shortSleeveTshirtScene,
-          scale: [1.8, 1.8, 1.8] as [number, number, number],
-          position: [0, -1.2, 0] as [number, number, number],
-          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] as [number, number, number] : [0, 0.2, 0.3] as [number, number, number]
-        };
-      case 'long-sleeve-tshirt':
-        return {
-          scene: longSleeveTshirtScene || shortSleeveTshirtScene,
-          scale: [1.8, 1.8, 1.8] as [number, number, number],
-          position: [0, -1.2, 0] as [number, number, number],
-          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] as [number, number, number] : [0, 0.2, 0.3] as [number, number, number]
-        };
-      case 'short-sleeve-polo':
-        return {
-          scene: shortSleeveTshirtScene,
-          scale: [1.8, 1.8, 1.8] as [number, number, number],
-          position: [0, -1.2, 0] as [number, number, number],
-          logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] as [number, number, number] : [0, 0.2, 0.3] as [number, number, number]
-        };
       case 'hoodie':
         return {
-          scene: hoodieScene || shortSleeveTshirtScene,
           scale: [1.5, 1.5, 1.5] as [number, number, number],
           position: [0, -1.2, 0] as [number, number, number],
           logoPosition: cameraView === 'back' ? [0, 0.1, -0.2] as [number, number, number] : [0, 0.1, 0.2] as [number, number, number]
         };
       default:
         return {
-          scene: shortSleeveTshirtScene,
           scale: [1.8, 1.8, 1.8] as [number, number, number],
           position: [0, -1.2, 0] as [number, number, number],
           logoPosition: cameraView === 'back' ? [0, 0.2, -0.3] as [number, number, number] : [0, 0.2, 0.3] as [number, number, number]
@@ -142,15 +102,11 @@ export const ImprovedApparelModel = () => {
 
   const modelConfig = getModelConfig();
 
-  if (!modelConfig.scene) {
-    return <ApparelModel />;
-  }
-
   return (
     <group ref={groupRef}>
       {/* GLTF Model */}
       <primitive 
-        object={modelConfig.scene.clone()} 
+        object={currentModel} 
         scale={modelConfig.scale}
         position={modelConfig.position}
         castShadow
@@ -168,21 +124,11 @@ export const ImprovedApparelModel = () => {
   );
 };
 
-// Preload models with error handling
-try {
-  useGLTF.preload('/oversized_t-shirt/scene.gltf');
-} catch (error) {
-  console.warn('Failed to preload oversized t-shirt model');
-}
-
-try {
-  useGLTF.preload('/long_sleeve_t-_shirt/scene.gltf');
-} catch (error) {
-  console.warn('Failed to preload long sleeve t-shirt model');
-}
-
-try {
-  useGLTF.preload('/hoodie_with_hood_up/scene.gltf');
-} catch (error) {
-  console.warn('Failed to preload hoodie model');
-}
+// Preload models for better performance
+Object.values(MODEL_PATHS).forEach(path => {
+  try {
+    useGLTF.preload(path);
+  } catch (error) {
+    console.warn(`Failed to preload model at ${path}`);
+  }
+});
