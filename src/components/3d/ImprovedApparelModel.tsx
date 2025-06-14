@@ -1,3 +1,4 @@
+
 import { useRef, useEffect, useState, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF, useTexture } from '@react-three/drei';
@@ -9,7 +10,7 @@ import { ApparelModel } from './ApparelModel';
 const MODEL_PATHS = {
   'short-sleeve-tshirt': '/oversized_t-shirt/scene.gltf',
   'long-sleeve-tshirt': '/long_sleeve_shirt/scene.gltf',
-  'short-sleeve-polo': '/short_sleeve_polo/short_sleeve_polo/scene.gltf',
+  'short-sleeve-polo': '/short_sleeve_polo/scene.gltf',
   'hoodie': '/hoodie_with_hood_up/scene.gltf',
 } as const;
 
@@ -43,8 +44,7 @@ const ModelLoader = ({ productType }: { productType: keyof typeof MODEL_PATHS })
   // Apply base color with optimized material updates
   useEffect(() => {
     if (gltf?.scene) {
-      const model = gltf.scene.clone();
-      model.traverse((child: any) => {
+      gltf.scene.traverse((child: any) => {
         if (child.isMesh && child.material) {
           // Clone material to avoid affecting other instances
           child.material = child.material.clone();
@@ -85,9 +85,11 @@ const ModelLoader = ({ productType }: { productType: keyof typeof MODEL_PATHS })
   };
 
   if (!gltf?.scene) {
+    console.log(`Loading model: ${modelPath}`);
     return null;
   }
 
+  console.log(`Model loaded successfully: ${productType}`);
   const modelConfig = getModelConfig();
   const model = gltf.scene.clone();
 
@@ -123,7 +125,16 @@ const ModelWithFallback = ({ productType }: { productType: keyof typeof MODEL_PA
   }
 
   return (
-    <Suspense fallback={<ApparelModel />}>
+    <Suspense 
+      fallback={
+        <group>
+          <mesh>
+            <boxGeometry args={[1, 1.5, 0.1]} />
+            <meshStandardMaterial color="#cccccc" />
+          </mesh>
+        </group>
+      }
+    >
       <ModelLoader productType={productType} />
     </Suspense>
   );
@@ -139,5 +150,6 @@ export const ImprovedApparelModel = () => {
 
 // Preload all models
 Object.values(MODEL_PATHS).forEach((path) => {
+  console.log(`Preloading model: ${path}`);
   useGLTF.preload(path);
 });

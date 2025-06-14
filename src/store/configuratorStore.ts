@@ -50,7 +50,10 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
   backgroundBlur: 0,
   isLoading: false,
 
-  setSelectedProduct: (product) => set({ selectedProduct: product }),
+  setSelectedProduct: (product) => {
+    console.log(`Switching to product: ${product}`);
+    set({ selectedProduct: product });
+  },
   setBaseColor: (color) => set({ baseColor: color }),
   setLogoImage: (image) => 
     set((state) => ({

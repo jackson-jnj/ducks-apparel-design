@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
 import { ImprovedApparelModel } from './ImprovedApparelModel';
+import { ModelLoadingSpinner } from './ModelLoader';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 import { PCFSoftShadowMap } from 'three';
 
@@ -45,8 +46,11 @@ export const Scene = () => {
         style={{
           background: getBackgroundColor(),
         }}
+        onError={(error) => {
+          console.error('Canvas error:', error);
+        }}
       >
-        <Suspense fallback={null}>
+        <Suspense fallback={<ModelLoadingSpinner />}>
           {/* Enhanced lighting setup */}
           <ambientLight intensity={0.6} />
           <directionalLight
