@@ -6,7 +6,7 @@ import { Mesh, Group } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 import { ApparelModel } from './ApparelModel';
 
-// Updated model paths with new models
+// Updated model paths with correct file structure
 const MODEL_PATHS = {
   'short-sleeve-tshirt': '/oversized_t-shirt/scene.gltf',
   'long-sleeve-tshirt': '/long_sleeve_shirt/scene.gltf',
