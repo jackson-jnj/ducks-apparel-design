@@ -1,8 +1,8 @@
 
 import { ProductSelector } from "./ProductSelector";
-import { ModernColorPicker } from "./ModernColorPicker";
+import { QuickColorPicker } from "./QuickColorPicker";
+import { QuickBackgroundControls } from "./QuickBackgroundControls";
 import { ViewControls } from "./ViewControls";
-import { BackgroundControls } from "./BackgroundControls";
 import { LogoUploader } from "./LogoUploader";
 import { LogoControls } from "./LogoControls";
 import { ExportPanel } from "./ExportPanel";
@@ -10,7 +10,7 @@ import { Settings, Upload } from "lucide-react";
 
 export const ControlPanel = () => {
   return (
-    <div className="h-full overflow-y-auto bg-white border-l border-gray-200">
+    <div className="h-full overflow-y-auto bg-gray-50">
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="text-left">
@@ -22,22 +22,16 @@ export const ControlPanel = () => {
         </div>
         
         {/* Upload Design Button */}
-        <button className="w-full bg-black text-white rounded-xl py-3 px-4 flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors">
+        <button className="w-full bg-black text-white rounded-xl py-3 px-4 flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors shadow-sm">
           <Upload className="w-4 h-4" />
           Upload Your Design
         </button>
         
-        {/* Advanced Controls Button */}
-        <button className="w-full bg-gray-100 text-gray-700 rounded-xl py-3 px-4 flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors">
-          <Settings className="w-4 h-4" />
-          Advanced Controls
-        </button>
-        
-        <div className="space-y-6">
+        <div className="space-y-4">
           <ProductSelector />
-          <ModernColorPicker />
+          <QuickColorPicker />
+          <QuickBackgroundControls />
           <ViewControls />
-          <BackgroundControls />
           <LogoUploader />
           <LogoControls />
           <ExportPanel />
