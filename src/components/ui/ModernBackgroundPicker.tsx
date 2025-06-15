@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from "react";
 import { useConfiguratorStore } from "@/store/configuratorStore";
 import { X, Image } from "lucide-react";
@@ -20,7 +21,7 @@ const ModernBackgroundPicker = ({
   onClose: () => void;
   onColorSelect?: (color: string) => void;
 }) => {
-  // Get color from store directly
+  // Get color store actions/states
   const { setBackgroundPreset, setBackgroundColor, backgroundColor } = useConfiguratorStore((s) => ({
     setBackgroundPreset: s.setBackgroundPreset,
     setBackgroundColor: s.setBackgroundColor,
@@ -33,7 +34,7 @@ const ModernBackgroundPicker = ({
   const [lightness, setLightness] = useState(98);
   const [input, setInput] = useState<string>("");
 
-  // Always sync color picker state to store color on open
+  // On mount/open: sync picker state to store color ONCE
   useEffect(() => {
     if (isOpen && backgroundColor) {
       const parsed = parseColor(backgroundColor);
@@ -44,19 +45,28 @@ const ModernBackgroundPicker = ({
         setInput(hslToString(parsed.h, parsed.s, parsed.l));
       }
     }
-  // eslint-disable-next-line
-  }, [isOpen, backgroundColor]);
+  // Only run when opening
+  }, [isOpen]); // Only on open
 
-  // Whenever picker state changes, push color to store (and trigger preview)
-  useEffect(() => {
-    if (!isOpen) return;
-    const colorString = hslToString(hue, saturation, lightness);
+  // Handlers that SET color in picker and in store
+  const handleHueChange = (newHue: number) => {
+    setHue(newHue);
+    const colorString = hslToString(newHue, saturation, lightness);
     setBackgroundPreset("white");
     setBackgroundColor(colorString);
     if (onColorSelect) onColorSelect(colorString);
     setInput(colorString);
-    // eslint-disable-next-line
-  }, [hue, saturation, lightness, isOpen]);
+  };
+
+  const handleSatLightChange = (s: number, l: number) => {
+    setSaturation(s);
+    setLightness(l);
+    const colorString = hslToString(hue, s, l);
+    setBackgroundPreset("white");
+    setBackgroundColor(colorString);
+    if (onColorSelect) onColorSelect(colorString);
+    setInput(colorString);
+  };
 
   // Text input handler (hex/rgb/hsl)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,6 +77,10 @@ const ModernBackgroundPicker = ({
       setHue(parsed.h);
       setSaturation(parsed.s);
       setLightness(parsed.l);
+      const colorString = hslToString(parsed.h, parsed.s, parsed.l);
+      setBackgroundPreset("white");
+      setBackgroundColor(colorString);
+      if (onColorSelect) onColorSelect(colorString);
     }
   };
 
@@ -88,7 +102,7 @@ const ModernBackgroundPicker = ({
         hue={hue}
         saturation={saturation}
         lightness={lightness}
-        onChange={(s, l) => { setSaturation(s); setLightness(l); }}
+        onChange={handleSatLightChange}
       />
       <div className="mb-2">
         <label className="block text-xs font-medium text-gray-700 mb-1">Hue</label>
@@ -98,7 +112,7 @@ const ModernBackgroundPicker = ({
           min="0"
           max="360"
           value={hue}
-          onChange={e => setHue(Number(e.target.value))}
+          onChange={e => handleHueChange(Number(e.target.value))}
           className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200"
           style={{
             background: 'linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)'
@@ -136,3 +150,4 @@ const ModernBackgroundPicker = ({
 };
 
 export default ModernBackgroundPicker;
+
