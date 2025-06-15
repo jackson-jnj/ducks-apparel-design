@@ -14,12 +14,12 @@ const MODEL_CONFIG = {
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
-    scale: [0.009, 0.009, 0.009],  // Reduced scale
+    scale: [0.015, 0.015, 0.015],  // FIXED: Increased scale for visibility
     position: [0, -1.8, 0],
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
-    scale: [0.009, 0.009, 0.009],  // Reduced scale
+    scale: [0.015, 0.015, 0.015],  // FIXED: Increased scale for visibility
     position: [0, -1.8, 0],
   },
   'hoodie': {
