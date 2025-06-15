@@ -21,8 +21,8 @@ export const Scene = () => {
     >
       <Canvas
         camera={{
-          position: [0, 0.5, 8],    // Moved camera back further and up
-          fov: 32,                 // Even narrower FOV for better fit
+          position: [0, 0, 4],
+          fov: 50,
           near: 0.1,
           far: 1000,
         }}
@@ -73,7 +73,7 @@ export const Scene = () => {
           {/* Ground shadows */}
           <ContactShadows
             rotation-x={Math.PI / 2}
-            position={[0, -2.5, 0]}    // Moved shadows down
+            position={[0, -1.5, 0]}
             opacity={0.4}
             width={8}
             height={8}
@@ -86,11 +86,11 @@ export const Scene = () => {
             enablePan={false}
             enableZoom={true}
             enableRotate={true}
-            minDistance={2}              // Allow zooming much closer
-            maxDistance={30}             // Allow zooming much further
+            minDistance={2}
+            maxDistance={10}
             minPolarAngle={Math.PI / 6}
             maxPolarAngle={Math.PI - Math.PI / 6}
-            target={[0, 0, 0]}          // Reset target to center
+            target={[0, 0, 0]}
             autoRotate={false}
             dampingFactor={0.08}
             enableDamping={true}
