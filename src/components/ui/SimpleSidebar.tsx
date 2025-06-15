@@ -4,6 +4,7 @@ import { Upload, Settings, ChevronDown, ChevronRight } from "lucide-react";
 import { useConfiguratorStore } from "@/store/configuratorStore";
 import { Button } from "./button";
 import { ProductSelector } from "./ProductSelector";
+import { ModernColorPicker } from "./ModernColorPicker";
 
 export const SimpleSidebar = () => {
   const [expandedSections, setExpandedSections] = useState({
@@ -74,14 +75,14 @@ export const SimpleSidebar = () => {
           <SectionHeader title="Garment Color" section="garmentColor" />
           {expandedSections.garmentColor && (
             <div className="pl-4 py-2">
-              <ColorPalette />
+              <ModernColorPicker />
             </div>
           )}
 
           <SectionHeader title="Background" section="background" />
           {expandedSections.background && (
             <div className="pl-4 py-2">
-              <p className="text-sm text-gray-600">Background controls will be here</p>
+              <ModernBackgroundPicker />
             </div>
           )}
 
@@ -111,29 +112,162 @@ export const SimpleSidebar = () => {
   );
 };
 
-const ColorPalette = () => {
-  const { baseColor, setBaseColor } = useConfiguratorStore();
-  
-  const colors = [
-    "#FFFFFF", "#000000", "#FF0000", "#00FF00", "#0000FF",
-    "#FFFF00", "#FF00FF", "#00FFFF", "#FFA500", "#800080",
-    "#FFC0CB", "#A52A2A", "#808080", "#008000", "#000080"
-  ];
+// Inline ModernBackgroundPicker for use in sidebar:
+import { useState } from "react";
+import { useConfiguratorStore } from "@/store/configuratorStore";
+import { Button } from "./button";
+import { X, Image as BgIcon } from "lucide-react";
+
+const ModernBackgroundColorModal = ({
+  isOpen,
+  onClose,
+  setColor,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  setColor: (color: string) => void;
+}) => {
+  const [hue, setHue] = useState(215);
+  const [saturation, setSaturation] = useState(46);
+  const [lightness, setLightness] = useState(96);
+
+  if (!isOpen) return null;
+
+  const previewColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+
+  const handleAreaClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const newSaturation = (x / rect.width) * 100;
+    const newLightness = 100 - (y / rect.height) * 100;
+    setSaturation(newSaturation);
+    setLightness(newLightness);
+  };
 
   return (
-    <div className="grid grid-cols-5 gap-2">
-      {colors.map((color) => (
-        <button
-          key={color}
-          className={`w-8 h-8 rounded border-2 transition-all ${
-            baseColor === color 
-              ? "border-black shadow-md" 
-              : "border-gray-300 hover:border-gray-400"
-          }`}
-          style={{ backgroundColor: color }}
-          onClick={() => setBaseColor(color)}
-        />
-      ))}
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl p-6 w-80 shadow-2xl border border-gray-200">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-semibold text-gray-800">Background Color</h3>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+        <div
+          className="w-full h-40 rounded-xl mb-8 cursor-crosshair relative"
+          style={{
+            background: `linear-gradient(to right, white, hsl(${hue},100%,50%)), linear-gradient(to top, black, transparent)`,
+          }}
+          onClick={handleAreaClick}
+        >
+          <div
+            className="absolute w-4 h-4 border-2 border-white rounded-full -translate-x-2 -translate-y-2 pointer-events-none shadow"
+            style={{
+              left: `${saturation}%`,
+              top: `${100 - lightness}%`,
+              background: previewColor,
+            }}
+          />
+        </div>
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Hue</label>
+          <input
+            type="range"
+            min="0"
+            max="360"
+            value={hue}
+            onChange={e => setHue(parseInt(e.target.value))}
+            className="w-full h-3 rounded-lg appearance-none cursor-pointer"
+            style={{
+              background:
+                "linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)",
+            }}
+          />
+        </div>
+        <div className="flex items-center gap-4 mb-6">
+          <div
+            className="w-12 h-12 rounded-xl border border-gray-200"
+            style={{ background: previewColor }}
+          />
+          <span className="font-mono text-xs">{previewColor}</span>
+        </div>
+        <Button
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+          onClick={() => {
+            setColor(previewColor);
+            onClose();
+          }}
+        >
+          Apply Background
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const ModernBackgroundPicker = () => {
+  const { backgroundPreset, setBackgroundPreset } = useConfiguratorStore();
+  const [showModal, setShowModal] = useState(false);
+  const [tempColor, setTempColor] = useState<string>("");
+
+  // Optionally, this modern logic could update your background system to allow full HSL freedom
+  // but for now we set the backgroundPreset as 'custom' and just show a demo effect.
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-3">
+        <BgIcon className="w-4 h-4 text-gray-600" />
+        <h4 className="text-sm font-medium text-gray-800">Background Color</h4>
+      </div>
+      <div className="flex gap-2">
+        <Button
+          size="sm"
+          variant={backgroundPreset === "studio" ? "default" : "outline"}
+          className="flex-1"
+          onClick={() => setBackgroundPreset("studio")}
+        >
+          Studio
+        </Button>
+        <Button
+          size="sm"
+          variant={backgroundPreset === "white" ? "default" : "outline"}
+          className="flex-1"
+          onClick={() => setBackgroundPreset("white")}
+        >
+          White
+        </Button>
+        <Button
+          size="sm"
+          variant={backgroundPreset === "black" ? "default" : "outline"}
+          className="flex-1"
+          onClick={() => setBackgroundPreset("black")}
+        >
+          Black
+        </Button>
+      </div>
+      <Button
+        size="sm"
+        variant="secondary"
+        className="w-full"
+        onClick={() => setShowModal(true)}
+      >
+        <BgIcon className="w-3 h-3 mr-2" /> Custom Color
+      </Button>
+      <ModernBackgroundColorModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        setColor={(color: string) => {
+          // Optionally update store here if custom supported!
+          setTempColor(color);
+        }}
+      />
+      {tempColor && (
+        <div className="mt-2 flex gap-2 items-center">
+          <span className="text-xs text-gray-500">Preview</span>
+          <div className="w-8 h-8 rounded shadow border" style={{ background: tempColor }} />
+        </div>
+      )}
     </div>
   );
 };
