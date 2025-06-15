@@ -7,27 +7,27 @@ import { useConfiguratorStore } from '@/store/configuratorStore';
 
 const DEBUG_BBOX = true;
 
-// Model configurations: Drastically increase the scale for small models
+// Drastically boost scale for all models
 const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
-    scale: [2.1, 2.1, 2.1],
-    position: [0, -1.6, 0], // closer to origin
+    scale: [3.5, 3.5, 3.5],
+    position: [0, -1.6, 0], // y centering will be corrected dynamically
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
-    scale: [2.1, 2.1, 2.1], // Increased scale dramatically
+    scale: [3.5, 3.5, 3.5],
     position: [0, -1.6, 0],
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
-    scale: [2.1, 2.1, 2.1], // Increased scale dramatically
+    scale: [3.5, 3.5, 3.5],
     position: [0, -1.6, 0],
   },
   'hoodie': {
     path: '/hoodie_with_hood_up/scene.gltf',
-    scale: [1.9, 1.9, 1.9],
-    position: [0, -1.7, 0],
+    scale: [3.3, 3.3, 3.3],
+    position: [0, -1.65, 0],
   },
 } as const;
 
@@ -54,25 +54,23 @@ export const ModelManager = () => {
       return;
     }
 
-    // CLONE so we don't affect cached scene
+    // Clone and center
     const model = scene.clone(true);
 
     // Compute bounding box
     const bbox = new Box3().setFromObject(model);
     const center = bbox.getCenter(new Vector3());
     const size = bbox.getSize(new Vector3());
-    // Center model at [0,0,0]
-    model.position.sub(center);
 
-    // Debug: log bounds and location
-    console.log(`Model: ${selectedProduct} - size:`, size, 'center:', center);
+    // Center the model at origin
+    model.position.set(-center.x, -center.y, -center.z);
 
     // For debug visualization, make a wireframe box
     if (DEBUG_BBOX) {
       const edges = new EdgesGeometry(new BoxGeometry(size.x, size.y, size.z));
       const line = new LineSegments(edges, new LineBasicMaterial({ color: 0xff00ff }));
-      // Center the bbox mesh
-      line.position.copy(model.position.add(center));
+      // The bounding box also needs to be at origin after recentering
+      line.position.set(0, 0, 0);
       setBboxObj(line);
     } else {
       setBboxObj(null);
