@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import { useConfiguratorStore } from "@/store/configuratorStore";
-import { X, Image } from "lucide-react";
+import { Image } from "lucide-react";
 import { Button } from "./button";
 import {
   hslToString,
@@ -21,34 +21,40 @@ const ModernBackgroundPicker = ({
   onClose: () => void;
   onColorSelect?: (color: string) => void;
 }) => {
-  // Get color store actions/states
+  // Get store actions/state
   const { setBackgroundPreset, setBackgroundColor, backgroundColor } = useConfiguratorStore((s) => ({
     setBackgroundPreset: s.setBackgroundPreset,
     setBackgroundColor: s.setBackgroundColor,
     backgroundColor: s.backgroundColor,
   }));
 
-  // Picker color state (local for UI only, but initialized from store)
+  // Picker local state (init from store)
   const [hue, setHue] = useState(220);
   const [saturation, setSaturation] = useState(30);
   const [lightness, setLightness] = useState(98);
   const [input, setInput] = useState<string>("");
 
-  // On mount/open: sync picker state to store color ONCE
+  // Remember previous isOpen state to run effect only on open transition
+  const prevIsOpen = useRef(false);
+
   useEffect(() => {
-    if (isOpen && backgroundColor) {
-      const parsed = parseColor(backgroundColor);
-      if (parsed) {
-        setHue(parsed.h);
-        setSaturation(parsed.s);
-        setLightness(parsed.l);
-        setInput(hslToString(parsed.h, parsed.s, parsed.l));
+    if (isOpen && !prevIsOpen.current) {
+      // Picker just opened: only now sync from store color
+      if (backgroundColor) {
+        const parsed = parseColor(backgroundColor);
+        if (parsed) {
+          setHue(parsed.h);
+          setSaturation(parsed.s);
+          setLightness(parsed.l);
+          setInput(hslToString(parsed.h, parsed.s, parsed.l));
+        }
       }
     }
-  // Only run when opening
-  }, [isOpen]); // Only on open
+    prevIsOpen.current = isOpen;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]); // NOT backgroundColor
 
-  // Handlers that SET color in picker and in store
+  // Handlers for user interaction, always update both local state and store (for live preview)
   const handleHueChange = (newHue: number) => {
     setHue(newHue);
     const colorString = hslToString(newHue, saturation, lightness);
@@ -84,7 +90,7 @@ const ModernBackgroundPicker = ({
     }
   };
 
-  // The Done button just closes the picker (color already live)
+  // Done just closes the picker (color is live)
   const handleApply = () => {
     onClose();
   };
@@ -150,4 +156,3 @@ const ModernBackgroundPicker = ({
 };
 
 export default ModernBackgroundPicker;
-
