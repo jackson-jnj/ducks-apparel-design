@@ -1,33 +1,33 @@
-
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import { Group, Object3D, Box3, Vector3, Mesh, BoxGeometry, LineSegments, EdgesGeometry, LineBasicMaterial } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 
-const DEBUG_BBOX = true;
+// Remove debug bounding box
+const DEBUG_BBOX = false;
 
-// Drastically boost scale for all models
+// Center/scaling configuration for each model
 const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
     scale: [3.5, 3.5, 3.5],
-    position: [0, -1.6, 0], // y centering will be corrected dynamically
+    baseYOffset: -1.6, // will auto-calculate perfect vertical centering per model
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
     scale: [3.5, 3.5, 3.5],
-    position: [0, -1.6, 0],
+    baseYOffset: -1.6,
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
     scale: [3.5, 3.5, 3.5],
-    position: [0, -1.6, 0],
+    baseYOffset: -1.6,
   },
   'hoodie': {
     path: '/hoodie_with_hood_up/scene.gltf',
     scale: [3.3, 3.3, 3.3],
-    position: [0, -1.65, 0],
+    baseYOffset: -1.65,
   },
 } as const;
 
@@ -41,7 +41,7 @@ export const ModelManager = () => {
   const { selectedProduct, baseColor, cameraView } = useConfiguratorStore();
   const config = MODEL_CONFIG[selectedProduct];
 
-  // Load model (no error returned from useGLTF)
+  // Load the GLTF model
   const { scene } = useGLTF(config.path, true);
 
   useEffect(() => {
@@ -54,10 +54,10 @@ export const ModelManager = () => {
       return;
     }
 
-    // Clone and center
+    // Clone the loaded scene
     const model = scene.clone(true);
 
-    // Compute bounding box
+    // Center the model: compute bounding box, center vertically & horizontally at [0,0,0]
     const bbox = new Box3().setFromObject(model);
     const center = bbox.getCenter(new Vector3());
     const size = bbox.getSize(new Vector3());
@@ -76,7 +76,17 @@ export const ModelManager = () => {
       setBboxObj(null);
     }
 
-    setCurrentModel(model);
+    // Adjust group position for perfect vertical centering: we want the base of the model to rest at Y=baseYOffset.
+    // The group is centered at origin, so let's offset Y such that the bottom bound is at baseYOffset.
+    // After model.position = -center, model's base is at -center.y + bbox.min.y
+    // group will be positioned at [0, dynamicY, 0], with dynamicY = config.baseYOffset - (bbox.min.y + model.position.y)
+    const lowestY = bbox.min.y + model.position.y;
+    const groupPosition = [0, config.baseYOffset - lowestY, 0];
+
+    setCurrentModel({
+      ...model,
+      userData: { __groupPosition: groupPosition }, // For dynamic centering
+    });
     setIsLoading(false);
   }, [scene, selectedProduct]);
 
@@ -93,7 +103,7 @@ export const ModelManager = () => {
     }
   }, [currentModel, baseColor, selectedProduct]);
 
-  // Camera view rotation
+  // Camera view rotation (keeps model visually centered because group is at [0,...,0])
   useFrame(() => {
     if (groupRef.current) {
       const targetRotation = cameraView === 'back' ? Math.PI :
@@ -131,13 +141,17 @@ export const ModelManager = () => {
     );
   }
 
+  // Read dynamic group centering position (falls back to [0, config.baseYOffset, 0])
+  const groupPosition: [number, number, number] = (currentModel.userData && currentModel.userData.__groupPosition) || [0, config.baseYOffset, 0];
+
   return (
     <group
       ref={groupRef}
       scale={config.scale}
-      position={config.position}
+      position={groupPosition}
+      // group is now positioned so that model is exactly centered in all directions & base is visually at the bottom.
     >
-      {/* Model at [0, 0, 0] */}
+      {/* Model centered at [0,0,0] */}
       <primitive object={currentModel} />
       {/* Show bounding box for debugging */}
       {bboxObj && <primitive object={bboxObj} />}
