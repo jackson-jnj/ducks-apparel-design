@@ -7,39 +7,31 @@ const Products = () => {
   const products = [
     {
       id: 1,
-      name: "Free Oversized T-Shirt Mockup",
-      image: "/api/placeholder/300/300",
+      name: "Oversized T-Shirt",
+      image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=600&fit=crop&crop=center",
       isFree: true,
+      modelPath: "oversized_t-shirt"
     },
     {
       id: 2,
-      name: "Cropped, Boy T-Shirt Mockup",
-      image: "/api/placeholder/300/300",
+      name: "Long Sleeve T-Shirt",
+      image: "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=600&h=600&fit=crop&crop=center",
       isFree: false,
+      modelPath: "long_sleeve_shirt"
     },
     {
       id: 3,
-      name: "Oversized Sweatshirt Mockup",
-      image: "/api/placeholder/300/300",
+      name: "Short Sleeve Polo",
+      image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&h=600&fit=crop&crop=center",
       isFree: false,
+      modelPath: "short_sleeve_polo"
     },
     {
       id: 4,
-      name: "Regular T-Shirt Mockup",
-      image: "/api/placeholder/300/300",
-      isFree: false,
-    },
-    {
-      id: 5,
-      name: "Hoodie Mockup",
-      image: "/api/placeholder/300/300",
-      isFree: false,
-    },
-    {
-      id: 6,
-      name: "Hoodie with Hood Up Mockup",
-      image: "/api/placeholder/300/300",
+      name: "Hoodie with Hood Up",
+      image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=600&fit=crop&crop=center",
       isFree: true,
+      modelPath: "hoodie_with_hood_up"
     },
   ];
 
@@ -62,7 +54,7 @@ const Products = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {products.map((product) => (
             <div key={product.id} className="group">
-              <div className="relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-200">
+              <div className="relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200">
                 {/* Free badge */}
                 {product.isFree && (
                   <div className="absolute top-4 left-4 z-10">
@@ -74,48 +66,51 @@ const Products = () => {
 
                 {/* Info icon */}
                 <div className="absolute top-4 right-4 z-10">
-                  <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
-                    <Info className="w-4 h-4 text-gray-600" />
+                  <div className="w-6 h-6 bg-black/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <Info className="w-4 h-4 text-white" />
                   </div>
                 </div>
 
                 {/* Product image */}
-                <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl mb-4 flex items-center justify-center overflow-hidden">
-                  <div className="w-48 h-56 bg-white rounded-lg shadow-sm flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300">
-                    <div className="w-40 h-48 bg-gray-50 rounded flex items-center justify-center">
-                      <span className="text-gray-400 text-xs">3D Model</span>
-                    </div>
-                  </div>
+                <div className="aspect-square overflow-hidden">
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
                 </div>
 
-                {/* Customize button */}
-                <div className="flex items-center justify-between">
+                {/* Product content */}
+                <div className="p-6">
+                  {/* Product name */}
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    {product.name}
+                  </h3>
+
+                  {/* Customize button */}
                   <Button 
                     variant="outline" 
-                    className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl px-4 py-2 flex items-center space-x-2"
+                    className="w-full bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 rounded-xl h-12 flex items-center justify-center space-x-2 group/btn"
                   >
                     <span>Customize</span>
-                    <div className="w-5 h-5 bg-gray-800 rounded flex items-center justify-center">
+                    <div className="w-5 h-5 bg-gray-800 group-hover/btn:bg-gray-900 rounded flex items-center justify-center transition-colors">
                       <span className="text-white text-xs">▶</span>
                     </div>
                   </Button>
                 </div>
               </div>
-
-              {/* Product name */}
-              <h3 className="text-lg font-medium text-gray-900 mt-4 text-center">
-                {product.name}
-              </h3>
             </div>
           ))}
         </div>
 
         {/* Load more section */}
         <div className="text-center mt-16">
+          <p className="text-gray-500 mb-4">More products coming soon!</p>
           <Button 
             variant="outline"
             size="lg"
             className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 rounded-xl"
+            disabled
           >
             Load More Products
           </Button>
