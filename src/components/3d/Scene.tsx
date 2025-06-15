@@ -8,21 +8,35 @@ import { PCFSoftShadowMap } from 'three';
 
 export const Scene = () => {
   return (
-    <div className="w-full h-full relative" style={{ background: '#2d3436' }}>
+    <div
+      className="w-full h-full flex items-center justify-center relative bg-gradient-to-b from-[#2d3436] to-[#636e72]"
+      style={{
+        minHeight: 0,
+        minWidth: 0,
+        maxHeight: "calc(100vh - 80px)",
+        maxWidth: "100vw",
+        overflow: "hidden",
+        margin: "0 auto",
+      }}
+    >
       <Canvas
-        camera={{ 
-          position: [0, 0, 4], 
+        camera={{
+          position: [0, 0, 4],
           fov: 50,
           near: 0.1,
-          far: 1000
+          far: 1000,
         }}
         shadows={{
           type: PCFSoftShadowMap,
-          enabled: true
+          enabled: true,
         }}
         dpr={[1, 2]}
         style={{
-          background: 'linear-gradient(135deg, #2d3436 0%, #636e72 100%)',
+          width: "100%",
+          height: "100%",
+          display: "block",
+          pointerEvents: "auto",
+          background: "transparent",
         }}
       >
         <Suspense fallback={<ModelLoadingSpinner />}>
