@@ -14,6 +14,9 @@ const MODEL_PATHS = {
   'hoodie': '/hoodie_with_hood_up/scene.gltf',
 } as const;
 
+// Clear any cached GLTF data to prevent path conflicts
+useGLTF.clear();
+
 // Individual model component that handles loading
 const ModelLoader = ({ productType }: { productType: keyof typeof MODEL_PATHS }) => {
   const groupRef = useRef<Group>(null);
@@ -24,8 +27,18 @@ const ModelLoader = ({ productType }: { productType: keyof typeof MODEL_PATHS })
   } = useConfiguratorStore();
   
   const modelPath = MODEL_PATHS[productType];
-  const gltf = useGLTF(modelPath);
-  const logoTexture = logoConfig.image ? useTexture(logoConfig.image) : null;
+  console.log(`Attempting to load model from: ${modelPath}`);
+  
+  let gltf;
+  let logoTexture = null;
+  
+  try {
+    gltf = useGLTF(modelPath);
+    logoTexture = logoConfig.image ? useTexture(logoConfig.image) : null;
+  } catch (error) {
+    console.error(`Failed to load model ${productType}:`, error);
+    return null;
+  }
 
   // Animation frame with optimized performance
   useFrame((state) => {
@@ -148,8 +161,17 @@ export const ImprovedApparelModel = () => {
   );
 };
 
-// Preload all models
-Object.values(MODEL_PATHS).forEach((path) => {
-  console.log(`Preloading model: ${path}`);
-  useGLTF.preload(path);
-});
+// Preload models individually with error handling
+const preloadModels = () => {
+  Object.entries(MODEL_PATHS).forEach(([productType, path]) => {
+    console.log(`Preloading model: ${productType} from ${path}`);
+    try {
+      useGLTF.preload(path);
+    } catch (error) {
+      console.error(`Failed to preload ${productType}:`, error);
+    }
+  });
+};
+
+// Initialize preloading
+preloadModels();
