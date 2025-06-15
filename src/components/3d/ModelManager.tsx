@@ -1,4 +1,3 @@
-
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
@@ -13,26 +12,26 @@ const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
     scale: [3.5, 3.5, 3.5],
-    baseYOffset: -1.2, // Tweak here for vertical fit (less negative = higher up)
-    collarYOffset: 0.42, // Move model up so collar is vertically centered
+    baseYOffset: -1.2,
+    collarYOffset: 0.54, // Increased from 0.42 to 0.54 for better centering
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
     scale: [3.5, 3.5, 3.5],
     baseYOffset: -1.2,
-    collarYOffset: 0.46,
+    collarYOffset: 0.60, // Increased from 0.46 to 0.60
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
     scale: [3.5, 3.5, 3.5],
     baseYOffset: -1.18,
-    collarYOffset: 0.33,
+    collarYOffset: 0.42, // Increased from 0.33 to 0.42
   },
   'hoodie': {
     path: '/hoodie_with_hood_up/scene.gltf',
     scale: [3.3, 3.3, 3.3],
     baseYOffset: -1.18,
-    collarYOffset: 0.28,
+    collarYOffset: 0.38, // Increased from 0.28 to 0.38
   },
 } as const;
 
