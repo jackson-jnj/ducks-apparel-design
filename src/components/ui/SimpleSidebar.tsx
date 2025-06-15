@@ -27,25 +27,37 @@ export const SimpleSidebar = () => {
   // Simulate popovers/dialogs for upload and export
   const handleUpload = () => {
     toast({
-      title: "Upload Design",
+      title: (
+        <span className="flex items-center gap-2">
+          <Upload className="w-5 h-5 text-sky-600" />
+          Upload Design
+        </span>
+      ),
       description: "Upload feature coming soon!",
-      icon: <Upload className="w-5 h-5 text-sky-600" />,
     });
   };
 
   const handleAdvanced = () => {
     toast({
-      title: "Advanced Controls",
+      title: (
+        <span className="flex items-center gap-2">
+          <Settings className="w-5 h-5 text-gray-800" />
+          Advanced Controls
+        </span>
+      ),
       description: "Advanced product controls will be added soon.",
-      icon: <Settings className="w-5 h-5 text-gray-800" />,
     });
   };
 
   const handleExport = () => {
     toast({
-      title: "Export",
+      title: (
+        <span className="flex items-center gap-2">
+          <ArrowDownToLine className="w-5 h-5 text-teal-600" />
+          Export
+        </span>
+      ),
       description: "Export functionality coming soon - video and image export will be available!",
-      icon: <ArrowDownToLine className="w-5 h-5 text-teal-600" />,
     });
   };
 
