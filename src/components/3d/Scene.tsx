@@ -46,9 +46,6 @@ export const Scene = () => {
         style={{
           background: getBackgroundColor(),
         }}
-        onError={(error) => {
-          console.error('Canvas error:', error);
-        }}
       >
         <Suspense fallback={<ModelLoadingSpinner />}>
           {/* Enhanced lighting setup */}
@@ -87,7 +84,7 @@ export const Scene = () => {
             blur={backgroundBlur * 0.01}
           />
 
-          {/* Model */}
+          {/* Model - Now loads immediately */}
           <ImprovedApparelModel />
 
           {/* Ground shadows */}

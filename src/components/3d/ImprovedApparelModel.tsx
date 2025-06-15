@@ -1,9 +1,9 @@
-import { useRef, useEffect, useState, Suspense } from 'react';
+
+import { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF, useTexture } from '@react-three/drei';
 import { Mesh, Group } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
-import { ApparelModel } from './ApparelModel';
 
 // Model paths with correct file structure
 const MODEL_PATHS = {
@@ -13,28 +13,26 @@ const MODEL_PATHS = {
   'hoodie': '/hoodie_with_hood_up/scene.gltf',
 } as const;
 
-// Individual model component that handles loading
-const ModelLoader = ({ productType }: { productType: keyof typeof MODEL_PATHS }) => {
+// Preload all models immediately
+Object.values(MODEL_PATHS).forEach(path => {
+  useGLTF.preload(path);
+});
+
+export const ImprovedApparelModel = () => {
   const groupRef = useRef<Group>(null);
   const { 
+    selectedProduct,
     baseColor, 
     logoConfig, 
     cameraView 
   } = useConfiguratorStore();
   
-  const modelPath = MODEL_PATHS[productType];
-  console.log(`Attempting to load model from: ${modelPath}`);
+  // Load the current model
+  const modelPath = MODEL_PATHS[selectedProduct];
+  const gltf = useGLTF(modelPath);
   
-  let gltf;
-  let logoTexture = null;
-  
-  try {
-    gltf = useGLTF(modelPath);
-    logoTexture = logoConfig.image ? useTexture(logoConfig.image) : null;
-  } catch (error) {
-    console.error(`Failed to load model ${productType}:`, error);
-    return null;
-  }
+  // Load logo texture if available
+  const logoTexture = logoConfig.image ? useTexture(logoConfig.image) : null;
 
   // Animation frame with optimized performance
   useFrame((state) => {
@@ -53,6 +51,7 @@ const ModelLoader = ({ productType }: { productType: keyof typeof MODEL_PATHS })
   // Apply base color with optimized material updates
   useEffect(() => {
     if (gltf?.scene) {
+      console.log(`Applying color ${baseColor} to model: ${selectedProduct}`);
       gltf.scene.traverse((child: any) => {
         if (child.isMesh && child.material) {
           // Clone material to avoid affecting other instances
@@ -62,10 +61,10 @@ const ModelLoader = ({ productType }: { productType: keyof typeof MODEL_PATHS })
         }
       });
     }
-  }, [baseColor, gltf]);
+  }, [baseColor, gltf, selectedProduct]);
 
   const getModelConfig = () => {
-    switch (productType) {
+    switch (selectedProduct) {
       case 'hoodie':
         return {
           scale: [1.5, 1.5, 1.5] as [number, number, number],
@@ -98,7 +97,7 @@ const ModelLoader = ({ productType }: { productType: keyof typeof MODEL_PATHS })
     return null;
   }
 
-  console.log(`Model loaded successfully: ${productType}`);
+  console.log(`Model loaded successfully: ${selectedProduct}`);
   const modelConfig = getModelConfig();
   const model = gltf.scene.clone();
 
@@ -123,51 +122,3 @@ const ModelLoader = ({ productType }: { productType: keyof typeof MODEL_PATHS })
     </group>
   );
 };
-
-// Error boundary component for model loading
-const ModelWithFallback = ({ productType }: { productType: keyof typeof MODEL_PATHS }) => {
-  const [hasError, setHasError] = useState(false);
-
-  if (hasError) {
-    console.log(`Using fallback model for ${productType} due to loading error`);
-    return <ApparelModel />;
-  }
-
-  return (
-    <Suspense 
-      fallback={
-        <group>
-          <mesh>
-            <boxGeometry args={[1, 1.5, 0.1]} />
-            <meshStandardMaterial color="#cccccc" />
-          </mesh>
-        </group>
-      }
-    >
-      <ModelLoader productType={productType} />
-    </Suspense>
-  );
-};
-
-export const ImprovedApparelModel = () => {
-  const { selectedProduct } = useConfiguratorStore();
-
-  return (
-    <ModelWithFallback productType={selectedProduct} />
-  );
-};
-
-// Preload models individually with error handling
-const preloadModels = () => {
-  Object.entries(MODEL_PATHS).forEach(([productType, path]) => {
-    console.log(`Preloading model: ${productType} from ${path}`);
-    try {
-      useGLTF.preload(path);
-    } catch (error) {
-      console.error(`Failed to preload ${productType}:`, error);
-    }
-  });
-};
-
-// Initialize preloading
-preloadModels();
