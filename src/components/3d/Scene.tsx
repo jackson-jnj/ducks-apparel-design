@@ -81,7 +81,7 @@ export const Scene = () => {
             far={4}
           />
 
-          {/* Enhanced orbit controls */}
+          {/* Enhanced orbit controls - REDUCED DAMPING FOR MORE STATIC MOVEMENT */}
           <OrbitControls
             enablePan={false}
             enableZoom={true}
@@ -92,7 +92,7 @@ export const Scene = () => {
             maxPolarAngle={Math.PI - Math.PI / 6}
             target={[0, 0, 0]}          // Reset target to center
             autoRotate={false}
-            dampingFactor={0.08}
+            dampingFactor={0.01}        // Much lower damping for instant response
             enableDamping={true}
           />
         </Suspense>

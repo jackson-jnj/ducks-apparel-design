@@ -78,12 +78,13 @@ export const ModelManager = () => {
     }
   }, [currentModel, baseColor, selectedProduct]);
   
-  // Handle camera view rotation
+  // Handle camera view rotation - STATIC, NO SMOOTHING
   useFrame(() => {
     if (groupRef.current) {
       const targetRotation = cameraView === 'back' ? Math.PI : 
                            cameraView === 'side' ? Math.PI / 2 : 0;
-      groupRef.current.rotation.y += (targetRotation - groupRef.current.rotation.y) * 0.05;
+      // Direct assignment - no interpolation
+      groupRef.current.rotation.y = targetRotation;
     }
   });
   
