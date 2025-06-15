@@ -1,80 +1,120 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import { useConfiguratorStore } from "@/store/configuratorStore";
-import { Image } from "lucide-react";
+import { X, Image } from "lucide-react";
 import { Button } from "./button";
 import {
   hslToString,
   parseColor,
 } from "./colorUtils";
-import { ColorArea } from "./ColorArea";
-import { PickerHeader } from "./PickerHeader";
 
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
-const ModernBackgroundPicker = ({
-  isOpen,
-  onClose,
-  onColorSelect,
+const ColorArea = ({
+  hue, saturation, lightness, onChange
 }: {
+  hue: number; saturation: number; lightness: number;
+  onChange: (s: number, l: number) => void;
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Enable drag and pointer for robust selector movement
+  useEffect(() => {
+    let down = false;
+    const handle = (e: MouseEvent) => {
+      if (!down || !ref.current) return;
+      const rect = ref.current.getBoundingClientRect();
+      const x = clamp(e.clientX - rect.left, 0, rect.width);
+      const y = clamp(e.clientY - rect.top, 0, rect.height);
+      const sat = clamp((x / rect.width) * 100, 0, 100);
+      const light = clamp(100 - (y / rect.height) * 100, 0, 100);
+      onChange(sat, light);
+    };
+    const up = () => { down = false; };
+    const downFn = () => { down = true; };
+    const area = ref.current;
+    if (area) area.addEventListener("mousedown", downFn);
+    document.addEventListener("mousemove", handle);
+    document.addEventListener("mouseup", up);
+    return () => {
+      if (area) area.removeEventListener("mousedown", downFn);
+      document.removeEventListener("mousemove", handle);
+      document.removeEventListener("mouseup", up);
+    };
+  }, [onChange]);
+
+  const onPointer = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = clamp(e.clientX - rect.left, 0, rect.width);
+    const y = clamp(e.clientY - rect.top, 0, rect.height);
+    const sat = clamp((x / rect.width) * 100, 0, 100);
+    const light = clamp(100 - (y / rect.height) * 100, 0, 100);
+    onChange(sat, light);
+  };
+
+  return (
+    <div
+      ref={ref}
+      className="relative w-full h-40 rounded-lg mb-4 cursor-crosshair shadow-inner bg-white"
+      style={{
+        background: `linear-gradient(to right, #fff, hsl(${hue},100%,50%)), linear-gradient(to top, #000, transparent)`,
+        touchAction: "none"
+      }}
+      onMouseDown={onPointer}
+      tabIndex={0}
+    >
+      <div
+        className="absolute w-4 h-4 border-2 border-white rounded-full pointer-events-none shadow-md"
+        style={{
+          left: `calc(${saturation}% - 8px)`,
+          top: `calc(${100 - lightness}% - 8px)`,
+          background: hslToString(hue, saturation, lightness),
+          boxShadow: "0 0 0 2px rgba(0,0,0,0.18), 0 4px 8px rgba(0,0,0,0.12)"
+        }}
+      />
+    </div>
+  );
+};
+
+type ModernBackgroundPickerProps = {
   isOpen: boolean;
   onClose: () => void;
   onColorSelect?: (color: string) => void;
-}) => {
-  // Get store actions/state
-  const { setBackgroundPreset, setBackgroundColor, backgroundColor } = useConfiguratorStore((s) => ({
-    setBackgroundPreset: s.setBackgroundPreset,
-    setBackgroundColor: s.setBackgroundColor,
-    backgroundColor: s.backgroundColor,
-  }));
+};
 
-  // Picker local state (init from store)
+export const ModernBackgroundPicker = ({
+  isOpen,
+  onClose,
+  onColorSelect,
+}: ModernBackgroundPickerProps) => {
+  const { setBackgroundPreset, setBackgroundColor } = useConfiguratorStore();
   const [hue, setHue] = useState(220);
   const [saturation, setSaturation] = useState(30);
   const [lightness, setLightness] = useState(98);
   const [input, setInput] = useState<string>("");
 
-  // Remember previous isOpen state to run effect only on open transition
-  const prevIsOpen = useRef(false);
-
+  // Whenever any color value changes, apply it instantly.
   useEffect(() => {
-    if (isOpen && !prevIsOpen.current) {
-      // Picker just opened: only now sync from store color
-      if (backgroundColor) {
-        const parsed = parseColor(backgroundColor);
-        if (parsed) {
-          setHue(parsed.h);
-          setSaturation(parsed.s);
-          setLightness(parsed.l);
-          setInput(hslToString(parsed.h, parsed.s, parsed.l));
-        }
-      }
+    if (!isOpen) return;
+    const colorString = hslToString(hue, saturation, lightness);
+    setBackgroundPreset("white");
+    setBackgroundColor(colorString);
+    if (onColorSelect) onColorSelect(colorString);
+    setInput(colorString); // Always keep text input in sync with current setting
+    // eslint-disable-next-line
+  }, [hue, saturation, lightness, isOpen]);
+
+  // When opened, reset to initial
+  useEffect(() => {
+    if (isOpen) {
+      setHue(220);
+      setSaturation(30);
+      setLightness(98);
+      setInput(hslToString(220, 30, 98));
     }
-    prevIsOpen.current = isOpen;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]); // NOT backgroundColor
+  }, [isOpen]);
 
-  // Handlers for user interaction, always update both local state and store (for live preview)
-  const handleHueChange = (newHue: number) => {
-    setHue(newHue);
-    const colorString = hslToString(newHue, saturation, lightness);
-    setBackgroundPreset("white");
-    setBackgroundColor(colorString);
-    if (onColorSelect) onColorSelect(colorString);
-    setInput(colorString);
-  };
-
-  const handleSatLightChange = (s: number, l: number) => {
-    setSaturation(s);
-    setLightness(l);
-    const colorString = hslToString(hue, s, l);
-    setBackgroundPreset("white");
-    setBackgroundColor(colorString);
-    if (onColorSelect) onColorSelect(colorString);
-    setInput(colorString);
-  };
-
-  // Text input handler (hex/rgb/hsl)
+  // Text input handler
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.trim();
     setInput(raw);
@@ -83,14 +123,10 @@ const ModernBackgroundPicker = ({
       setHue(parsed.h);
       setSaturation(parsed.s);
       setLightness(parsed.l);
-      const colorString = hslToString(parsed.h, parsed.s, parsed.l);
-      setBackgroundPreset("white");
-      setBackgroundColor(colorString);
-      if (onColorSelect) onColorSelect(colorString);
     }
   };
 
-  // Done just closes the picker (color is live)
+  // The "Apply" button just closes the picker now, as color is already applied live
   const handleApply = () => {
     onClose();
   };
@@ -99,16 +135,25 @@ const ModernBackgroundPicker = ({
 
   return (
     <div className="w-full space-y-4 animate-fade-in">
-      <PickerHeader
-        title="Background Color"
-        icon={<Image className="w-4 h-4 text-sky-600" />}
-        onClose={onClose}
-      />
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-medium text-gray-800 flex gap-2 items-center">
+          <Image className="w-4 h-4 text-sky-600" />
+          <span>Background Color</span>
+        </h3>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="h-8 w-8 rounded-full"
+        >
+          <X className="w-4 h-4" />
+        </Button>
+      </div>
       <ColorArea
         hue={hue}
         saturation={saturation}
         lightness={lightness}
-        onChange={handleSatLightChange}
+        onChange={(s, l) => { setSaturation(s); setLightness(l); }}
       />
       <div className="mb-2">
         <label className="block text-xs font-medium text-gray-700 mb-1">Hue</label>
@@ -118,13 +163,14 @@ const ModernBackgroundPicker = ({
           min="0"
           max="360"
           value={hue}
-          onChange={e => handleHueChange(Number(e.target.value))}
+          onChange={e => setHue(Number(e.target.value))}
           className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200"
           style={{
             background: 'linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)'
           }}
         />
       </div>
+      {/* Custom color input */}
       <div>
         <label className="block text-xs font-medium text-gray-700 mb-1">Custom Color (hex/rgb/hsl)</label>
         <input
@@ -155,4 +201,3 @@ const ModernBackgroundPicker = ({
   );
 };
 
-export default ModernBackgroundPicker;
