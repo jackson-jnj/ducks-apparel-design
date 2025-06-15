@@ -21,8 +21,8 @@ export const Scene = () => {
     >
       <Canvas
         camera={{
-          position: [0, 0, 4],
-          fov: 50,
+          position: [0, 0.1, 5.5], // Moved slightly up and further out, original was [0, 0, 4]
+          fov: 36,                  // Narrower FOV (was 50), fits taller models
           near: 0.1,
           far: 1000,
         }}
@@ -86,11 +86,11 @@ export const Scene = () => {
             enablePan={false}
             enableZoom={true}
             enableRotate={true}
-            minDistance={2}
-            maxDistance={10}
+            minDistance={3}
+            maxDistance={12}
             minPolarAngle={Math.PI / 6}
             maxPolarAngle={Math.PI - Math.PI / 6}
-            target={[0, 0, 0]}
+            target={[0, 0.12, 0]} // Focus higher (closer to chest)
             autoRotate={false}
             dampingFactor={0.08}
             enableDamping={true}
@@ -100,3 +100,4 @@ export const Scene = () => {
     </div>
   );
 };
+

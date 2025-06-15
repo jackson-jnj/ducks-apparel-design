@@ -2,30 +2,30 @@
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
-import { Group, Object3D } from 'three';
+import { Group, Object3D, Box3, Vector3 } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 
-// Model configurations: Larger scale and centered vertically with less space below
+// Model configurations: Tweaked Y so all are in view based on their center, scaled for consistent fit
 const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
-    scale: [2.1, 2.1, 2.1], // was 1.8
-    position: [0, -0.9, 0], // was -1.2
+    scale: [2.05, 2.05, 2.05],
+    position: [0, -1.05, 0], // more down for oversized
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
-    scale: [0.013, 0.013, 0.013], // was 0.01
-    position: [0, -0.9, 0],
+    scale: [0.012, 0.012, 0.012],
+    position: [0, -1.01, 0],
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
-    scale: [0.013, 0.013, 0.013], // was 0.01
-    position: [0, -0.9, 0],
+    scale: [0.012, 0.012, 0.012],
+    position: [0, -1.015, 0],
   },
   'hoodie': {
     path: '/hoodie_with_hood_up/scene.gltf',
-    scale: [1.8, 1.8, 1.8], // was 1.5
-    position: [0, -0.95, 0],
+    scale: [1.7, 1.7, 1.7],
+    position: [0, -1.12, 0],
   },
 } as const;
 
@@ -46,7 +46,6 @@ export const ModelManager = () => {
     setIsLoading(true);
     setError(null);
 
-    // Check if the scene is present
     if (!scene) {
       setError(`Failed to load model for ${selectedProduct}`);
       setIsLoading(false);
@@ -54,9 +53,16 @@ export const ModelManager = () => {
     }
 
     const clonedScene = scene.clone();
+
+    // Debug: log model bounds to adjust centering/scale if needed
+    const bbox = new Box3().setFromObject(clonedScene);
+    const size = bbox.getSize(new Vector3());
+    const center = bbox.getCenter(new Vector3());
+    // eslint-disable-next-line no-console
+    console.log(`Model: ${selectedProduct} - size:`, size, 'center:', center);
+
     setCurrentModel(clonedScene);
     setIsLoading(false);
-  // Only re-run if scene or product changes
   }, [scene, selectedProduct]);
   
   // Apply color to model
@@ -118,3 +124,4 @@ export const ModelManager = () => {
 Object.values(MODEL_CONFIG).forEach(({ path }) => {
   useGLTF.preload(path);
 });
+
