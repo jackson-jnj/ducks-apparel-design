@@ -5,27 +5,27 @@ import { useGLTF } from '@react-three/drei';
 import { Group, Object3D, Box3, Vector3 } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 
-// Model configurations: Tweaked Y so all are in view based on their center, scaled for consistent fit
+// Model configurations: Adjusted for better visibility in viewport
 const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
-    scale: [2.05, 2.05, 2.05],
-    position: [0, -1.05, 0], // more down for oversized
+    scale: [1.6, 1.6, 1.6],        // Reduced scale
+    position: [0, -1.8, 0],        // Moved down more
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
-    scale: [0.012, 0.012, 0.012],
-    position: [0, -1.01, 0],
+    scale: [0.009, 0.009, 0.009],  // Reduced scale
+    position: [0, -1.8, 0],
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
-    scale: [0.012, 0.012, 0.012],
-    position: [0, -1.015, 0],
+    scale: [0.009, 0.009, 0.009],  // Reduced scale
+    position: [0, -1.8, 0],
   },
   'hoodie': {
     path: '/hoodie_with_hood_up/scene.gltf',
-    scale: [1.7, 1.7, 1.7],
-    position: [0, -1.12, 0],
+    scale: [1.3, 1.3, 1.3],        // Reduced scale
+    position: [0, -2.0, 0],        // Moved down more for hoodie
   },
 } as const;
 
@@ -124,4 +124,3 @@ export const ModelManager = () => {
 Object.values(MODEL_CONFIG).forEach(({ path }) => {
   useGLTF.preload(path);
 });
-

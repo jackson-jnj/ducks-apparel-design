@@ -21,8 +21,8 @@ export const Scene = () => {
     >
       <Canvas
         camera={{
-          position: [0, 0.1, 5.5], // Moved slightly up and further out, original was [0, 0, 4]
-          fov: 36,                  // Narrower FOV (was 50), fits taller models
+          position: [0, 0.5, 8],    // Moved camera back further and up
+          fov: 32,                 // Even narrower FOV for better fit
           near: 0.1,
           far: 1000,
         }}
@@ -73,7 +73,7 @@ export const Scene = () => {
           {/* Ground shadows */}
           <ContactShadows
             rotation-x={Math.PI / 2}
-            position={[0, -1.5, 0]}
+            position={[0, -2.5, 0]}    // Moved shadows down
             opacity={0.4}
             width={8}
             height={8}
@@ -86,11 +86,11 @@ export const Scene = () => {
             enablePan={false}
             enableZoom={true}
             enableRotate={true}
-            minDistance={3}
-            maxDistance={12}
+            minDistance={5}              // Increased min distance
+            maxDistance={15}             // Increased max distance
             minPolarAngle={Math.PI / 6}
             maxPolarAngle={Math.PI - Math.PI / 6}
-            target={[0, 0.12, 0]} // Focus higher (closer to chest)
+            target={[0, 0, 0]}          // Reset target to center
             autoRotate={false}
             dampingFactor={0.08}
             enableDamping={true}
@@ -100,4 +100,3 @@ export const Scene = () => {
     </div>
   );
 };
-
