@@ -88,7 +88,7 @@ export const ModernColorPicker = () => {
   const [lightness, setLightness] = useState(50);
   const [input, setInput] = useState<string>("");
 
-  // Open/Sync logic
+  // Only sync FROM store TO local state (one-way)
   useEffect(() => {
     const parsed = parseColor(baseColor);
     if (parsed) {
@@ -102,13 +102,21 @@ export const ModernColorPicker = () => {
     }
   }, [baseColor]);
 
-  // On change, sync store and input
-  useEffect(() => {
-    const hsl = hslToString(hue, saturation, lightness);
-    setBaseColor(hsl);
-    setInput(hsl);
-    // eslint-disable-next-line
-  }, [hue, saturation, lightness]);
+  // Handlers that update both local state and store immediately
+  const handleHueChange = (newHue: number) => {
+    setHue(newHue);
+    const colorString = hslToString(newHue, saturation, lightness);
+    setBaseColor(colorString);
+    setInput(colorString);
+  };
+
+  const handleSatLightChange = (s: number, l: number) => {
+    setSaturation(s);
+    setLightness(l);
+    const colorString = hslToString(hue, s, l);
+    setBaseColor(colorString);
+    setInput(colorString);
+  };
 
   // Text input handler
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,7 +143,7 @@ export const ModernColorPicker = () => {
         hue={hue}
         saturation={saturation}
         lightness={lightness}
-        onChange={(s, l) => { setSaturation(s); setLightness(l); }}
+        onChange={handleSatLightChange}
       />
       <div className="mb-2">
         <label className="block text-xs font-medium text-gray-700 mb-1">Hue</label>
@@ -145,14 +153,13 @@ export const ModernColorPicker = () => {
           min="0"
           max="360"
           value={hue}
-          onChange={e => setHue(Number(e.target.value))}
+          onChange={e => handleHueChange(Number(e.target.value))}
           className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200"
           style={{
             background: 'linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)'
           }}
         />
       </div>
-      {/* Custom color input */}
       <div>
         <label className="block text-xs font-medium text-gray-700 mb-1">Custom Color (hex/rgb/hsl)</label>
         <input
@@ -176,4 +183,3 @@ export const ModernColorPicker = () => {
     </div>
   );
 };
-// ModernColorPicker is over 216 lines, consider asking for a refactor if you want to add more features!
