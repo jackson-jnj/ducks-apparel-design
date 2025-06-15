@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 
 export type ProductType = 'short-sleeve-tshirt' | 'long-sleeve-tshirt' | 'short-sleeve-polo' | 'hoodie';
@@ -19,6 +18,7 @@ interface ConfiguratorState {
   cameraView: CameraView;
   backgroundPreset: BackgroundPreset;
   backgroundBlur: number;
+  backgroundColor: string;
   isLoading: boolean;
   
   // Actions
@@ -31,6 +31,7 @@ interface ConfiguratorState {
   setCameraView: (view: CameraView) => void;
   setBackgroundPreset: (preset: BackgroundPreset) => void;
   setBackgroundBlur: (blur: number) => void;
+  setBackgroundColor: (color: string) => void;
   setLoading: (loading: boolean) => void;
   resetCamera: () => void;
   resetConfiguration: () => void;
@@ -48,6 +49,7 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
   cameraView: 'front',
   backgroundPreset: 'studio',
   backgroundBlur: 0,
+  backgroundColor: "hsl(220, 30%, 98%)",
   isLoading: false,
 
   setSelectedProduct: (product) => {
@@ -74,6 +76,7 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
   setCameraView: (view) => set({ cameraView: view }),
   setBackgroundPreset: (preset) => set({ backgroundPreset: preset }),
   setBackgroundBlur: (blur) => set({ backgroundBlur: blur }),
+  setBackgroundColor: (color) => set({ backgroundColor: color }),
   setLoading: (loading) => set({ isLoading: loading }),
   resetCamera: () => set({ cameraView: 'front' }),
   resetConfiguration: () => set({
@@ -81,6 +84,7 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
     cameraView: 'front',
     backgroundPreset: 'studio',
     backgroundBlur: 0,
+    backgroundColor: "hsl(220, 30%, 98%)",
     logoConfig: {
       image: null,
       position: [0, 0.2, 0.51],

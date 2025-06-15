@@ -4,9 +4,11 @@ import { Scene } from "@/components/3d/Scene";
 import { Header } from "@/components/ui/Header";
 import { SimpleSidebar } from "@/components/ui/SimpleSidebar";
 import { useLocation } from "react-router-dom";
+import { useConfiguratorStore } from "@/store/configuratorStore";
 
 const Index = () => {
   const location = useLocation();
+  const backgroundColor = useConfiguratorStore((s) => s.backgroundColor);
 
   // Lock scrolling ONLY on this page
   useEffect(() => {
@@ -19,7 +21,10 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 min-h-screen bg-gray-50 flex flex-col z-0">
+    <div
+      className="fixed inset-0 min-h-screen flex flex-col z-0"
+      style={{ background: backgroundColor }}
+    >
       {/* Header always visible/fixed */}
       <Header />
       {/* Main content with sidebar and perfect center */}

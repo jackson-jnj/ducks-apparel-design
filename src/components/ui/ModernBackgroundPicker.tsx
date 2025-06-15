@@ -88,7 +88,7 @@ export const ModernBackgroundPicker = ({
   onClose,
   onColorSelect,
 }: ModernBackgroundPickerProps) => {
-  const { setBackgroundPreset } = useConfiguratorStore();
+  const { setBackgroundPreset, setBackgroundColor } = useConfiguratorStore();
   const [hue, setHue] = useState(220);
   const [saturation, setSaturation] = useState(30);
   const [lightness, setLightness] = useState(98);
@@ -121,8 +121,10 @@ export const ModernBackgroundPicker = ({
   };
 
   const handleApply = () => {
-    setBackgroundPreset("white"); // Store could be improved for true dynamic color
-    if (onColorSelect) onColorSelect(hslToString(hue, saturation, lightness));
+    setBackgroundPreset("white");
+    const colorString = hslToString(hue, saturation, lightness);
+    setBackgroundColor(colorString);
+    if (onColorSelect) onColorSelect(colorString);
     onClose();
   };
 

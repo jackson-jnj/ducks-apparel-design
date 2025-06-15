@@ -1,10 +1,11 @@
 
 import { useState } from "react";
-import { Upload, Settings, ChevronDown, ChevronRight } from "lucide-react";
+import { Upload, Settings, ChevronDown, ChevronRight, CheckCircle, AlertTriangle, ArrowDownToLine } from "lucide-react";
 import { Button } from "./button";
 import { ProductSelector } from "./ProductSelector";
 import { ModernColorPicker } from "./ModernColorPicker";
 import { BackgroundControls } from "./BackgroundControls";
+import { useToast } from "@/hooks/use-toast";
 
 export const SimpleSidebar = () => {
   const [expandedSections, setExpandedSections] = useState({
@@ -14,11 +15,38 @@ export const SimpleSidebar = () => {
     cameraAnimation: false
   });
 
+  const { toast } = useToast();
+
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section]
     }));
+  };
+
+  // Simulate popovers/dialogs for upload and export
+  const handleUpload = () => {
+    toast({
+      title: "Upload Design",
+      description: "Upload feature coming soon!",
+      icon: <Upload className="w-5 h-5 text-sky-600" />,
+    });
+  };
+
+  const handleAdvanced = () => {
+    toast({
+      title: "Advanced Controls",
+      description: "Advanced product controls will be added soon.",
+      icon: <Settings className="w-5 h-5 text-gray-800" />,
+    });
+  };
+
+  const handleExport = () => {
+    toast({
+      title: "Export",
+      description: "Export functionality coming soon - video and image export will be available!",
+      icon: <ArrowDownToLine className="w-5 h-5 text-teal-600" />,
+    });
   };
 
   const SectionHeader = ({
@@ -54,13 +82,17 @@ export const SimpleSidebar = () => {
     <div className="w-64 bg-white border-r border-gray-200 h-full overflow-y-auto">
       <div className="p-4 space-y-3">
         {/* Upload Design Button */}
-        <Button className="w-full bg-black hover:bg-gray-800 text-white rounded-lg py-3 flex items-center justify-center space-x-2">
+        <Button className="w-full bg-black hover:bg-gray-800 text-white rounded-lg py-3 flex items-center justify-center space-x-2"
+          onClick={handleUpload}
+        >
           <Upload className="w-4 h-4" />
           <span>Upload Your Design</span>
         </Button>
 
         {/* Advanced Controls Button */}
-        <Button variant="outline" className="w-full border-gray-300 text-gray-700 rounded-lg py-3 flex items-center justify-center space-x-2">
+        <Button variant="outline" className="w-full border-gray-300 text-gray-700 rounded-lg py-3 flex items-center justify-center space-x-2"
+          onClick={handleAdvanced}
+        >
           <Settings className="w-4 h-4" />
           <span>Advanced Controls</span>
         </Button>
@@ -103,7 +135,9 @@ export const SimpleSidebar = () => {
 
         {/* Export Button */}
         <div className="pt-4">
-          <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white rounded-lg py-3">
+          <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white rounded-lg py-3"
+            onClick={handleExport}
+          >
             Export
           </Button>
         </div>

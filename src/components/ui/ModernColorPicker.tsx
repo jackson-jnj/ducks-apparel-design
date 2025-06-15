@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useConfiguratorStore } from "@/store/configuratorStore";
 import { X, Palette } from "lucide-react";
 import { Button } from "./button";
@@ -20,7 +20,7 @@ const ColorArea = ({
   hue: number; saturation: number; lightness: number;
   onChange: (s: number, l: number) => void;
 }) => {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = React.useRef<HTMLDivElement>(null);
 
   // Support drag on palette area
   useEffect(() => {
@@ -82,8 +82,6 @@ const ColorArea = ({
 
 export const ModernColorPicker = () => {
   const { baseColor, setBaseColor } = useConfiguratorStore();
-  const [isPickerOpen, setPickerOpen] = useState(false);
-
   // Picker state (single source of truth: h, s, l)
   const [hue, setHue] = useState(200);
   const [saturation, setSaturation] = useState(50);
@@ -92,28 +90,25 @@ export const ModernColorPicker = () => {
 
   // Open/Sync logic
   useEffect(() => {
-    if (isPickerOpen) {
-      const parsed = parseColor(baseColor);
-      if (parsed) {
-        setHue(parsed.h);
-        setSaturation(parsed.s);
-        setLightness(parsed.l);
-        setInput(hslToString(parsed.h, parsed.s, parsed.l));
-      } else {
-        setHue(200); setSaturation(50); setLightness(50);
-        setInput(hslToString(200, 50, 50));
-      }
+    const parsed = parseColor(baseColor);
+    if (parsed) {
+      setHue(parsed.h);
+      setSaturation(parsed.s);
+      setLightness(parsed.l);
+      setInput(hslToString(parsed.h, parsed.s, parsed.l));
+    } else {
+      setHue(200); setSaturation(50); setLightness(50);
+      setInput(hslToString(200, 50, 50));
     }
-  }, [isPickerOpen, baseColor]);
+  }, [baseColor]);
 
   // On change, sync store and input
   useEffect(() => {
-    if (isPickerOpen) {
-      const hsl = hslToString(hue, saturation, lightness);
-      setBaseColor(hsl);
-      setInput(hsl);
-    }
-  }, [hue, saturation, lightness, isPickerOpen, setBaseColor]);
+    const hsl = hslToString(hue, saturation, lightness);
+    setBaseColor(hsl);
+    setInput(hsl);
+    // eslint-disable-next-line
+  }, [hue, saturation, lightness]);
 
   // Text input handler
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,24 +123,6 @@ export const ModernColorPicker = () => {
     }
   };
 
-  if (!isPickerOpen) {
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Palette className="w-4 h-4 text-gray-600" />
-          <h3 className="text-sm font-medium text-gray-800">Garment Color</h3>
-        </div>
-        <button
-          className="w-full h-12 rounded-lg border border-gray-200 cursor-pointer flex items-center justify-center text-white font-medium shadow-sm hover:shadow-md transition-all duration-200"
-          style={{ backgroundColor: baseColor }}
-          onClick={() => setPickerOpen(true)}
-        >
-          <span className="drop-shadow-sm">Click to Change Color</span>
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between">
@@ -153,14 +130,6 @@ export const ModernColorPicker = () => {
           <Palette className="w-4 h-4 text-gray-600" />
           <span>Garment Color</span>
         </h3>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setPickerOpen(false)}
-          className="h-8 w-8 rounded-full"
-        >
-          <X className="w-4 h-4" />
-        </Button>
       </div>
       <ColorArea
         hue={hue}
@@ -204,12 +173,7 @@ export const ModernColorPicker = () => {
           <span className="block font-mono">{hslToString(hue, saturation, lightness)}</span>
         </div>
       </div>
-      <Button
-        onClick={() => setPickerOpen(false)}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2 text-sm"
-      >
-        Done
-      </Button>
     </div>
   );
 };
+// ModernColorPicker is over 216 lines, consider asking for a refactor if you want to add more features!
