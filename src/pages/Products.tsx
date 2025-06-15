@@ -8,21 +8,21 @@ const Products = () => {
     {
       id: 1,
       name: "Oversized T-Shirt",
-      image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=600&fit=crop&crop=center",
+      image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&h=600&fit=crop&crop=center",
       isFree: true,
       modelPath: "oversized_t-shirt"
     },
     {
       id: 2,
       name: "Long Sleeve T-Shirt",
-      image: "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=600&h=600&fit=crop&crop=center",
+      image: "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&h=600&fit=crop&crop=center",
       isFree: false,
       modelPath: "long_sleeve_shirt"
     },
     {
       id: 3,
       name: "Short Sleeve Polo",
-      image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&h=600&fit=crop&crop=center",
+      image: "https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?w=600&h=600&fit=crop&crop=center",
       isFree: false,
       modelPath: "short_sleeve_polo"
     },
@@ -72,7 +72,7 @@ const Products = () => {
                 </div>
 
                 {/* Product image */}
-                <div className="aspect-square overflow-hidden">
+                <div className="aspect-square overflow-hidden bg-gray-100">
                   <img 
                     src={product.image} 
                     alt={product.name}
