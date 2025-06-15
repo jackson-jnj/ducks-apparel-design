@@ -1,3 +1,4 @@
+
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
@@ -12,22 +13,26 @@ const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
     scale: [3.5, 3.5, 3.5],
-    baseYOffset: -1.6, // will auto-calculate perfect vertical centering per model
+    baseYOffset: -1.2, // Tweak here for vertical fit (less negative = higher up)
+    collarYOffset: 0.42, // Move model up so collar is vertically centered
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
     scale: [3.5, 3.5, 3.5],
-    baseYOffset: -1.6,
+    baseYOffset: -1.2,
+    collarYOffset: 0.46,
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
     scale: [3.5, 3.5, 3.5],
-    baseYOffset: -1.6,
+    baseYOffset: -1.18,
+    collarYOffset: 0.33,
   },
   'hoodie': {
     path: '/hoodie_with_hood_up/scene.gltf',
     scale: [3.3, 3.3, 3.3],
-    baseYOffset: -1.65,
+    baseYOffset: -1.18,
+    collarYOffset: 0.28,
   },
 } as const;
 
@@ -76,13 +81,19 @@ export const ModelManager = () => {
       setBboxObj(null);
     }
 
-    // Adjust group position for perfect vertical centering
-    const lowestY = bbox.min.y + model.position.y;
-    const groupPosition = [0, config.baseYOffset - lowestY, 0];
+    // New: Try to center around neckline/collar for visual balance
+    // Visual Y center ≈ collar/top ~ bbox.max.y
+    // Place model so that center of canvas aligns with collar minus an offset (for a little headroom)
+    const yFromOriginToTop = bbox.max.y + model.position.y;
+    // This offset places the collar line closer to the canvas center.
+    // You may tweak the collarYOffset per garment for best results!
+    const groupPosition: [number, number, number] = [
+      0,
+      config.baseYOffset - yFromOriginToTop + (config.collarYOffset ?? 0),
+      0
+    ];
 
-    // This is the FIX: assign to model.userData directly!
     model.userData.__groupPosition = groupPosition;
-
     setCurrentModel(model);
 
     setIsLoading(false);
