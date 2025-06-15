@@ -4,6 +4,7 @@ import { Upload, Settings, ChevronDown, ChevronRight, ArrowDownToLine } from "lu
 import { Button } from "./button";
 import { ProductSelector } from "./ProductSelector";
 import { ModernColorPicker } from "./ModernColorPicker";
+import { ModernBackgroundPicker } from "./ModernBackgroundPicker";
 import { BackgroundControls } from "./BackgroundControls";
 import { useToast } from "@/hooks/use-toast";
 
@@ -24,7 +25,6 @@ export const SimpleSidebar = () => {
     }));
   };
 
-  // Simulate popovers/dialogs for upload and export
   const handleUpload = () => {
     toast({
       title: "Upload Design",
@@ -111,7 +111,7 @@ export const SimpleSidebar = () => {
           <SectionHeader title="Background" section="background" />
           {expandedSections.background && (
             <div className="pl-4 py-2">
-              <BackgroundControls />
+              <ModernBackgroundPicker isOpen={true} onClose={() => {}} />
             </div>
           )}
 
@@ -142,3 +142,6 @@ export const SimpleSidebar = () => {
     </div>
   );
 };
+
+// No extra export needed
+

@@ -82,7 +82,6 @@ type ModernBackgroundPickerProps = {
   onColorSelect?: (color: string) => void;
 };
 
-// Always renders as sidebar drawer, not overlay, for seamless background selection
 export const ModernBackgroundPicker = ({
   isOpen,
   onClose,
@@ -94,19 +93,26 @@ export const ModernBackgroundPicker = ({
   const [lightness, setLightness] = useState(98);
   const [input, setInput] = useState<string>("");
 
-  // Open/Sync logic for background color (ideally you will use a color state from store, but this demo uses local)
+  // Whenever any color value changes, apply it instantly.
+  useEffect(() => {
+    if (!isOpen) return;
+    const colorString = hslToString(hue, saturation, lightness);
+    setBackgroundPreset("white");
+    setBackgroundColor(colorString);
+    if (onColorSelect) onColorSelect(colorString);
+    setInput(colorString); // Always keep text input in sync with current setting
+    // eslint-disable-next-line
+  }, [hue, saturation, lightness, isOpen]);
+
+  // When opened, reset to initial
   useEffect(() => {
     if (isOpen) {
-      // Default to a near-white blue pastel; could sync with store.get backgroundColor in real usage
-      setHue(220); setSaturation(30); setLightness(98);
+      setHue(220);
+      setSaturation(30);
+      setLightness(98);
       setInput(hslToString(220, 30, 98));
     }
   }, [isOpen]);
-
-  // Update input while dragging
-  useEffect(() => {
-    if (isOpen) setInput(hslToString(hue, saturation, lightness));
-  }, [hue, saturation, lightness, isOpen]);
 
   // Text input handler
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,11 +126,8 @@ export const ModernBackgroundPicker = ({
     }
   };
 
+  // The "Apply" button just closes the picker now, as color is already applied live
   const handleApply = () => {
-    setBackgroundPreset("white");
-    const colorString = hslToString(hue, saturation, lightness);
-    setBackgroundColor(colorString);
-    if (onColorSelect) onColorSelect(colorString);
     onClose();
   };
 
@@ -192,8 +195,9 @@ export const ModernBackgroundPicker = ({
         onClick={handleApply}
         className="w-full bg-sky-600 hover:bg-sky-700 text-white rounded-lg py-2"
       >
-        Apply Color
+        Done
       </Button>
     </div>
   );
 };
+
