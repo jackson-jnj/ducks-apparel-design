@@ -1,9 +1,10 @@
 
 import { useState } from "react";
 import { Upload, Settings, ChevronDown, ChevronRight } from "lucide-react";
-import { useConfiguratorStore } from "@/store/configuratorStore";
 import { Button } from "./button";
 import { ProductSelector } from "./ProductSelector";
+import { ModernColorPicker } from "./ModernColorPicker";
+import { BackgroundControls } from "./BackgroundControls";
 
 export const SimpleSidebar = () => {
   const [expandedSections, setExpandedSections] = useState({
@@ -20,12 +21,12 @@ export const SimpleSidebar = () => {
     }));
   };
 
-  const SectionHeader = ({ 
-    title, 
-    section, 
-    isPro = false 
-  }: { 
-    title: string; 
+  const SectionHeader = ({
+    title,
+    section,
+    isPro = false
+  }: {
+    title: string;
     section: keyof typeof expandedSections;
     isPro?: boolean;
   }) => (
@@ -74,14 +75,14 @@ export const SimpleSidebar = () => {
           <SectionHeader title="Garment Color" section="garmentColor" />
           {expandedSections.garmentColor && (
             <div className="pl-4 py-2">
-              <ColorPalette />
+              <ModernColorPicker />
             </div>
           )}
 
           <SectionHeader title="Background" section="background" />
           {expandedSections.background && (
             <div className="pl-4 py-2">
-              <p className="text-sm text-gray-600">Background controls will be here</p>
+              <BackgroundControls />
             </div>
           )}
 
@@ -107,33 +108,6 @@ export const SimpleSidebar = () => {
           </Button>
         </div>
       </div>
-    </div>
-  );
-};
-
-const ColorPalette = () => {
-  const { baseColor, setBaseColor } = useConfiguratorStore();
-  
-  const colors = [
-    "#FFFFFF", "#000000", "#FF0000", "#00FF00", "#0000FF",
-    "#FFFF00", "#FF00FF", "#00FFFF", "#FFA500", "#800080",
-    "#FFC0CB", "#A52A2A", "#808080", "#008000", "#000080"
-  ];
-
-  return (
-    <div className="grid grid-cols-5 gap-2">
-      {colors.map((color) => (
-        <button
-          key={color}
-          className={`w-8 h-8 rounded border-2 transition-all ${
-            baseColor === color 
-              ? "border-black shadow-md" 
-              : "border-gray-300 hover:border-gray-400"
-          }`}
-          style={{ backgroundColor: color }}
-          onClick={() => setBaseColor(color)}
-        />
-      ))}
     </div>
   );
 };
