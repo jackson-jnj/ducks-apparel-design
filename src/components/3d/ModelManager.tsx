@@ -1,4 +1,3 @@
-
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
@@ -39,30 +38,29 @@ export const ModelManager = () => {
   
   const config = MODEL_CONFIG[selectedProduct];
   
-  // Load model with error handling
-  const { scene, error: gltfError } = useGLTF(config.path, true);
+  // Load model (no error returned from useGLTF)
+  const { scene } = useGLTF(config.path, true);
   
   useEffect(() => {
-    if (gltfError) {
-      console.error(`Failed to load ${selectedProduct}:`, gltfError);
-      setError(`Failed to load ${selectedProduct} model`);
+    setIsLoading(true);
+    setError(null);
+
+    // Check if the scene is present
+    if (!scene) {
+      setError(`Failed to load model for ${selectedProduct}`);
       setIsLoading(false);
       return;
     }
-    
-    if (scene) {
-      console.log(`Successfully loaded ${selectedProduct} model`);
-      const clonedScene = scene.clone();
-      setCurrentModel(clonedScene);
-      setError(null);
-      setIsLoading(false);
-    }
-  }, [scene, gltfError, selectedProduct]);
+
+    const clonedScene = scene.clone();
+    setCurrentModel(clonedScene);
+    setIsLoading(false);
+  // Only re-run if scene or product changes
+  }, [scene, selectedProduct]);
   
   // Apply color to model
   useEffect(() => {
     if (currentModel) {
-      console.log(`Applying color ${baseColor} to ${selectedProduct}`);
       currentModel.traverse((child: any) => {
         if (child.isMesh && child.material) {
           child.material = child.material.clone();
