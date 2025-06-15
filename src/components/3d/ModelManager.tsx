@@ -76,17 +76,15 @@ export const ModelManager = () => {
       setBboxObj(null);
     }
 
-    // Adjust group position for perfect vertical centering: we want the base of the model to rest at Y=baseYOffset.
-    // The group is centered at origin, so let's offset Y such that the bottom bound is at baseYOffset.
-    // After model.position = -center, model's base is at -center.y + bbox.min.y
-    // group will be positioned at [0, dynamicY, 0], with dynamicY = config.baseYOffset - (bbox.min.y + model.position.y)
+    // Adjust group position for perfect vertical centering
     const lowestY = bbox.min.y + model.position.y;
     const groupPosition = [0, config.baseYOffset - lowestY, 0];
 
-    setCurrentModel({
-      ...model,
-      userData: { __groupPosition: groupPosition }, // For dynamic centering
-    });
+    // This is the FIX: assign to model.userData directly!
+    model.userData.__groupPosition = groupPosition;
+
+    setCurrentModel(model);
+
     setIsLoading(false);
   }, [scene, selectedProduct]);
 
