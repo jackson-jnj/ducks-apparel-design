@@ -1,4 +1,3 @@
-
 import { useRef, useEffect, useState, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF, useTexture } from '@react-three/drei';
@@ -13,9 +12,6 @@ const MODEL_PATHS = {
   'short-sleeve-polo': '/short_sleeve_polo/scene.gltf',
   'hoodie': '/hoodie_with_hood_up/scene.gltf',
 } as const;
-
-// Clear any cached GLTF data to prevent path conflicts
-useGLTF.clear();
 
 // Individual model component that handles loading
 const ModelLoader = ({ productType }: { productType: keyof typeof MODEL_PATHS }) => {
