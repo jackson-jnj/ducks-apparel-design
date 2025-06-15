@@ -2,46 +2,48 @@
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
-import { Group, Object3D, Box3, Vector3 } from 'three';
+import { Group, Object3D, Box3, Vector3, Mesh, BoxGeometry, LineSegments, EdgesGeometry, LineBasicMaterial } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 
-// Model configurations: Adjusted for better visibility in viewport
+const DEBUG_BBOX = true;
+
+// Model configurations: Stronger scale, initial positions centered
 const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
-    scale: [1.6, 1.6, 1.6],        // Reduced scale
-    position: [0, -1.8, 0],        // Moved down more
+    scale: [2.1, 2.1, 2.1],
+    position: [0, -1.6, 0], // closer to origin
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
-    scale: [0.015, 0.015, 0.015],  // FIXED: Increased scale for visibility
-    position: [0, -1.8, 0],
+    scale: [0.025, 0.025, 0.025], // even larger for debug
+    position: [0, -1.6, 0],
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
-    scale: [0.015, 0.015, 0.015],  // FIXED: Increased scale for visibility
-    position: [0, -1.8, 0],
+    scale: [0.025, 0.025, 0.025],
+    position: [0, -1.6, 0],
   },
   'hoodie': {
     path: '/hoodie_with_hood_up/scene.gltf',
-    scale: [1.3, 1.3, 1.3],        // Reduced scale
-    position: [0, -2.0, 0],        // Moved down more for hoodie
+    scale: [1.9, 1.9, 1.9],
+    position: [0, -1.7, 0],
   },
 } as const;
 
 export const ModelManager = () => {
   const groupRef = useRef<Group>(null);
   const [currentModel, setCurrentModel] = useState<Object3D | null>(null);
+  const [bboxObj, setBboxObj] = useState<Object3D | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const { selectedProduct, baseColor, cameraView } = useConfiguratorStore();
-  
   const config = MODEL_CONFIG[selectedProduct];
 
   // Load model (no error returned from useGLTF)
   const { scene } = useGLTF(config.path, true);
-  
+
   useEffect(() => {
     setIsLoading(true);
     setError(null);
@@ -52,19 +54,34 @@ export const ModelManager = () => {
       return;
     }
 
-    const clonedScene = scene.clone();
+    // CLONE so we don't affect cached scene
+    const model = scene.clone(true);
 
-    // Debug: log model bounds to adjust centering/scale if needed
-    const bbox = new Box3().setFromObject(clonedScene);
-    const size = bbox.getSize(new Vector3());
+    // Compute bounding box
+    const bbox = new Box3().setFromObject(model);
     const center = bbox.getCenter(new Vector3());
-    // eslint-disable-next-line no-console
+    const size = bbox.getSize(new Vector3());
+    // Center model at [0,0,0]
+    model.position.sub(center);
+
+    // Debug: log bounds and location
     console.log(`Model: ${selectedProduct} - size:`, size, 'center:', center);
 
-    setCurrentModel(clonedScene);
+    // For debug visualization, make a wireframe box
+    if (DEBUG_BBOX) {
+      const edges = new EdgesGeometry(new BoxGeometry(size.x, size.y, size.z));
+      const line = new LineSegments(edges, new LineBasicMaterial({ color: 0xff00ff }));
+      // Center the bbox mesh
+      line.position.copy(model.position.add(center));
+      setBboxObj(line);
+    } else {
+      setBboxObj(null);
+    }
+
+    setCurrentModel(model);
     setIsLoading(false);
   }, [scene, selectedProduct]);
-  
+
   // Apply color to model
   useEffect(() => {
     if (currentModel) {
@@ -77,17 +94,23 @@ export const ModelManager = () => {
       });
     }
   }, [currentModel, baseColor, selectedProduct]);
-  
-  // Handle camera view rotation - STATIC, NO SMOOTHING
+
+  // Camera view rotation
   useFrame(() => {
     if (groupRef.current) {
-      const targetRotation = cameraView === 'back' ? Math.PI : 
-                           cameraView === 'side' ? Math.PI / 2 : 0;
-      // Direct assignment - no interpolation
+      const targetRotation = cameraView === 'back' ? Math.PI :
+        cameraView === 'side' ? Math.PI / 2 : 0;
       groupRef.current.rotation.y = targetRotation;
+      // Debug log transforms
+      if ((window as any)._lov_modelFrames === undefined) (window as any)._lov_modelFrames = 0;
+      if (++(window as any)._lov_modelFrames % 60 === 1) {
+        console.log("groupRef transform:", groupRef.current.position, groupRef.current.rotation, groupRef.current.scale);
+        if (currentModel)
+          console.log("currentModel position:", currentModel.position, "rotation:", currentModel.rotation);
+      }
     }
   });
-  
+
   if (error) {
     return (
       <group>
@@ -98,7 +121,7 @@ export const ModelManager = () => {
       </group>
     );
   }
-  
+
   if (isLoading || !currentModel) {
     return (
       <group>
@@ -109,14 +132,17 @@ export const ModelManager = () => {
       </group>
     );
   }
-  
+
   return (
-    <group 
+    <group
       ref={groupRef}
       scale={config.scale}
       position={config.position}
     >
+      {/* Model at [0, 0, 0] */}
       <primitive object={currentModel} />
+      {/* Show bounding box for debugging */}
+      {bboxObj && <primitive object={bboxObj} />}
     </group>
   );
 };
