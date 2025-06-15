@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Upload, Settings, ChevronDown, ChevronRight, CheckCircle, AlertTriangle, ArrowDownToLine } from "lucide-react";
+import { Upload, Settings, ChevronDown, ChevronRight, ArrowDownToLine } from "lucide-react";
 import { Button } from "./button";
 import { ProductSelector } from "./ProductSelector";
 import { ModernColorPicker } from "./ModernColorPicker";
@@ -27,36 +27,21 @@ export const SimpleSidebar = () => {
   // Simulate popovers/dialogs for upload and export
   const handleUpload = () => {
     toast({
-      title: (
-        <span className="flex items-center gap-2">
-          <Upload className="w-5 h-5 text-sky-600" />
-          Upload Design
-        </span>
-      ),
+      title: "Upload Design",
       description: "Upload feature coming soon!",
     });
   };
 
   const handleAdvanced = () => {
     toast({
-      title: (
-        <span className="flex items-center gap-2">
-          <Settings className="w-5 h-5 text-gray-800" />
-          Advanced Controls
-        </span>
-      ),
+      title: "Advanced Controls",
       description: "Advanced product controls will be added soon.",
     });
   };
 
   const handleExport = () => {
     toast({
-      title: (
-        <span className="flex items-center gap-2">
-          <ArrowDownToLine className="w-5 h-5 text-teal-600" />
-          Export
-        </span>
-      ),
+      title: "Export",
       description: "Export functionality coming soon - video and image export will be available!",
     });
   };
