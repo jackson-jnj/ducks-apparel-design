@@ -7,7 +7,7 @@ import { useConfiguratorStore } from '@/store/configuratorStore';
 
 const DEBUG_BBOX = true;
 
-// Model configurations: Stronger scale, initial positions centered
+// Model configurations: Drastically increase the scale for small models
 const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
@@ -16,12 +16,12 @@ const MODEL_CONFIG = {
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
-    scale: [0.025, 0.025, 0.025], // even larger for debug
+    scale: [2.1, 2.1, 2.1], // Increased scale dramatically
     position: [0, -1.6, 0],
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
-    scale: [0.025, 0.025, 0.025],
+    scale: [2.1, 2.1, 2.1], // Increased scale dramatically
     position: [0, -1.6, 0],
   },
   'hoodie': {
