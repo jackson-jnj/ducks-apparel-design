@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Upload, Settings, ChevronDown, ChevronRight } from "lucide-react";
 import { useConfiguratorStore } from "@/store/configuratorStore";
@@ -113,11 +112,6 @@ export const SimpleSidebar = () => {
 };
 
 // Inline ModernBackgroundPicker for use in sidebar:
-import { useState } from "react";
-import { useConfiguratorStore } from "@/store/configuratorStore";
-import { Button } from "./button";
-import { X, Image as BgIcon } from "lucide-react";
-
 const ModernBackgroundColorModal = ({
   isOpen,
   onClose,
@@ -211,9 +205,6 @@ const ModernBackgroundPicker = () => {
   const [showModal, setShowModal] = useState(false);
   const [tempColor, setTempColor] = useState<string>("");
 
-  // Optionally, this modern logic could update your background system to allow full HSL freedom
-  // but for now we set the backgroundPreset as 'custom' and just show a demo effect.
-
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-3">
@@ -258,7 +249,6 @@ const ModernBackgroundPicker = () => {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         setColor={(color: string) => {
-          // Optionally update store here if custom supported!
           setTempColor(color);
         }}
       />
