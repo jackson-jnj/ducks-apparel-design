@@ -18,7 +18,6 @@ const ColorArea = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  // Enable drag and pointer for robust selector movement
   useEffect(() => {
     let down = false;
     const handle = (e: MouseEvent) => {
@@ -87,34 +86,45 @@ export const ModernBackgroundPicker = ({
   onClose,
   onColorSelect,
 }: ModernBackgroundPickerProps) => {
-  const { setBackgroundPreset, setBackgroundColor } = useConfiguratorStore();
+  // Get color from store directly
+  const { setBackgroundPreset, setBackgroundColor, backgroundColor } = useConfiguratorStore((s) => ({
+    setBackgroundPreset: s.setBackgroundPreset,
+    setBackgroundColor: s.setBackgroundColor,
+    backgroundColor: s.backgroundColor,
+  }));
+
+  // Picker color state (local for UI only, but initialized from store)
   const [hue, setHue] = useState(220);
   const [saturation, setSaturation] = useState(30);
   const [lightness, setLightness] = useState(98);
   const [input, setInput] = useState<string>("");
 
-  // Whenever any color value changes, apply it instantly.
+  // Always sync color picker state to store color on open
+  useEffect(() => {
+    if (isOpen && backgroundColor) {
+      const parsed = parseColor(backgroundColor);
+      if (parsed) {
+        setHue(parsed.h);
+        setSaturation(parsed.s);
+        setLightness(parsed.l);
+        setInput(hslToString(parsed.h, parsed.s, parsed.l));
+      }
+    }
+  // eslint-disable-next-line
+  }, [isOpen, backgroundColor]);
+
+  // Whenever picker state changes, push color to store (and trigger preview)
   useEffect(() => {
     if (!isOpen) return;
     const colorString = hslToString(hue, saturation, lightness);
     setBackgroundPreset("white");
     setBackgroundColor(colorString);
     if (onColorSelect) onColorSelect(colorString);
-    setInput(colorString); // Always keep text input in sync with current setting
+    setInput(colorString);
     // eslint-disable-next-line
   }, [hue, saturation, lightness, isOpen]);
 
-  // When opened, reset to initial
-  useEffect(() => {
-    if (isOpen) {
-      setHue(220);
-      setSaturation(30);
-      setLightness(98);
-      setInput(hslToString(220, 30, 98));
-    }
-  }, [isOpen]);
-
-  // Text input handler
+  // Text input handler (hex/rgb/hsl)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.trim();
     setInput(raw);
@@ -126,7 +136,7 @@ export const ModernBackgroundPicker = ({
     }
   };
 
-  // The "Apply" button just closes the picker now, as color is already applied live
+  // The Done button just closes the picker (color already live)
   const handleApply = () => {
     onClose();
   };
@@ -200,4 +210,3 @@ export const ModernBackgroundPicker = ({
     </div>
   );
 };
-
