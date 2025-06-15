@@ -86,8 +86,8 @@ export const Scene = () => {
             enablePan={false}
             enableZoom={true}
             enableRotate={true}
-            minDistance={5}              // Increased min distance
-            maxDistance={15}             // Increased max distance
+            minDistance={2}              // Allow zooming much closer
+            maxDistance={30}             // Allow zooming much further
             minPolarAngle={Math.PI / 6}
             maxPolarAngle={Math.PI - Math.PI / 6}
             target={[0, 0, 0]}          // Reset target to center
