@@ -1,30 +1,31 @@
+
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import { Group, Object3D } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 
-// Model configurations
+// Model configurations: Larger scale and centered vertically with less space below
 const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
-    scale: [1.8, 1.8, 1.8],
-    position: [0, -1.2, 0],
+    scale: [2.1, 2.1, 2.1], // was 1.8
+    position: [0, -0.9, 0], // was -1.2
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
-    scale: [0.01, 0.01, 0.01],
-    position: [0, -1.2, 0],
+    scale: [0.013, 0.013, 0.013], // was 0.01
+    position: [0, -0.9, 0],
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
-    scale: [0.01, 0.01, 0.01],
-    position: [0, -1.2, 0],
+    scale: [0.013, 0.013, 0.013], // was 0.01
+    position: [0, -0.9, 0],
   },
   'hoodie': {
     path: '/hoodie_with_hood_up/scene.gltf',
-    scale: [1.5, 1.5, 1.5],
-    position: [0, -1.2, 0],
+    scale: [1.8, 1.8, 1.8], // was 1.5
+    position: [0, -0.95, 0],
   },
 } as const;
 
@@ -37,7 +38,7 @@ export const ModelManager = () => {
   const { selectedProduct, baseColor, cameraView } = useConfiguratorStore();
   
   const config = MODEL_CONFIG[selectedProduct];
-  
+
   // Load model (no error returned from useGLTF)
   const { scene } = useGLTF(config.path, true);
   
