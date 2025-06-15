@@ -4,7 +4,7 @@ import { Upload, Settings, ChevronDown, ChevronRight, ArrowDownToLine } from "lu
 import { Button } from "./button";
 import { ProductSelector } from "./ProductSelector";
 import { ModernColorPicker } from "./ModernColorPicker";
-import { ModernBackgroundPicker } from "./ModernBackgroundPicker";
+import ModernBackgroundPicker from "./ModernBackgroundPicker";
 import { BackgroundControls } from "./BackgroundControls";
 import { useToast } from "@/hooks/use-toast";
 

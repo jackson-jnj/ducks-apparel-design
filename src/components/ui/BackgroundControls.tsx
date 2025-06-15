@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Slider } from "./slider";
 import { useConfiguratorStore } from "@/store/configuratorStore";
-import { ModernBackgroundPicker } from "./ModernBackgroundPicker";
+import ModernBackgroundPicker from "./ModernBackgroundPicker";
 
 export const BackgroundControls = () => {
   const {
