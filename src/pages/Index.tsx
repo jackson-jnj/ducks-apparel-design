@@ -13,22 +13,24 @@ const Index = () => {
     // Store previous value to restore
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = prevOverflow;
+      document.documentElement.style.overflow = "";
     };
   }, []);
 
   return (
-    <div className="fixed inset-0 min-h-screen bg-gray-50 flex flex-col z-0">
+    <div className="fixed inset-0 w-screen h-screen min-h-0 min-w-0 bg-gray-50 flex flex-col z-0 overflow-hidden">
       {/* Header always visible/fixed */}
       <Header />
-      {/* Main content with sidebar and perfect center */}
-      <div className="flex-1 flex min-h-0">
+      {/* Main content: sidebar + scene, fixed and NO scroll */}
+      <div className="flex-1 flex min-h-0 min-w-0 overflow-hidden">
         {/* Sidebar */}
         <SimpleSidebar />
         {/* 3D Viewer section (centered both directions, always fills available space) */}
-        <div className="flex-1 flex items-center justify-center relative min-h-0">
-          <div className="w-full h-full flex items-center justify-center max-h-[calc(100vh-80px)]">
+        <div className="flex-1 flex items-center justify-center relative min-h-0 min-w-0 overflow-hidden">
+          <div className="w-full h-full flex items-center justify-center">
             <Scene />
           </div>
         </div>

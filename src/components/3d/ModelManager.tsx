@@ -12,22 +12,22 @@ const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
     scale: [3.5, 3.5, 3.5],
-    position: [0, -1.6, 0], // y centering will be corrected dynamically
+    position: [0, 0, 0],
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
     scale: [3.5, 3.5, 3.5],
-    position: [0, -1.6, 0],
+    position: [0, 0, 0],
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
     scale: [3.5, 3.5, 3.5],
-    position: [0, -1.6, 0],
+    position: [0, 0, 0],
   },
   'hoodie': {
     path: '/hoodie_with_hood_up/scene.gltf',
     scale: [3.3, 3.3, 3.3],
-    position: [0, -1.65, 0],
+    position: [0, 0, 0],
   },
 } as const;
 
@@ -57,19 +57,27 @@ export const ModelManager = () => {
     // Clone and center
     const model = scene.clone(true);
 
-    // Compute bounding box
-    const bbox = new Box3().setFromObject(model);
+    // Compute bounding box after scaling, so we get true post-scale dimensions
+    const tempGroup = new Group();
+    tempGroup.add(model);
+    tempGroup.scale.set(config.scale[0], config.scale[1], config.scale[2]);
+    tempGroup.position.set(0, 0, 0);
+
+    // find bounding box and position such that model is always perfectly centered at y=0
+    const bbox = new Box3().setFromObject(tempGroup);
     const center = bbox.getCenter(new Vector3());
     const size = bbox.getSize(new Vector3());
 
-    // Center the model at origin
+    // Remove it from temp group for further manipulation
+    tempGroup.remove(model);
+
+    // Offset the model so the bbox center is at the origin
     model.position.set(-center.x, -center.y, -center.z);
 
-    // For debug visualization, make a wireframe box
+    // For debug visualization, make a wireframe box for post-scale and positioning
     if (DEBUG_BBOX) {
       const edges = new EdgesGeometry(new BoxGeometry(size.x, size.y, size.z));
       const line = new LineSegments(edges, new LineBasicMaterial({ color: 0xff00ff }));
-      // The bounding box also needs to be at origin after recentering
       line.position.set(0, 0, 0);
       setBboxObj(line);
     } else {
