@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from "react";
 import { useConfiguratorStore } from "@/store/configuratorStore";
 import { X, Image } from "lucide-react";
@@ -7,85 +6,20 @@ import {
   hslToString,
   parseColor,
 } from "./colorUtils";
+import { ColorArea } from "./ColorArea";
+import { PickerHeader } from "./PickerHeader";
 
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
-const ColorArea = ({
-  hue, saturation, lightness, onChange
-}: {
-  hue: number; saturation: number; lightness: number;
-  onChange: (s: number, l: number) => void;
-}) => {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let down = false;
-    const handle = (e: MouseEvent) => {
-      if (!down || !ref.current) return;
-      const rect = ref.current.getBoundingClientRect();
-      const x = clamp(e.clientX - rect.left, 0, rect.width);
-      const y = clamp(e.clientY - rect.top, 0, rect.height);
-      const sat = clamp((x / rect.width) * 100, 0, 100);
-      const light = clamp(100 - (y / rect.height) * 100, 0, 100);
-      onChange(sat, light);
-    };
-    const up = () => { down = false; };
-    const downFn = () => { down = true; };
-    const area = ref.current;
-    if (area) area.addEventListener("mousedown", downFn);
-    document.addEventListener("mousemove", handle);
-    document.addEventListener("mouseup", up);
-    return () => {
-      if (area) area.removeEventListener("mousedown", downFn);
-      document.removeEventListener("mousemove", handle);
-      document.removeEventListener("mouseup", up);
-    };
-  }, [onChange]);
-
-  const onPointer = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = clamp(e.clientX - rect.left, 0, rect.width);
-    const y = clamp(e.clientY - rect.top, 0, rect.height);
-    const sat = clamp((x / rect.width) * 100, 0, 100);
-    const light = clamp(100 - (y / rect.height) * 100, 0, 100);
-    onChange(sat, light);
-  };
-
-  return (
-    <div
-      ref={ref}
-      className="relative w-full h-40 rounded-lg mb-4 cursor-crosshair shadow-inner bg-white"
-      style={{
-        background: `linear-gradient(to right, #fff, hsl(${hue},100%,50%)), linear-gradient(to top, #000, transparent)`,
-        touchAction: "none"
-      }}
-      onMouseDown={onPointer}
-      tabIndex={0}
-    >
-      <div
-        className="absolute w-4 h-4 border-2 border-white rounded-full pointer-events-none shadow-md"
-        style={{
-          left: `calc(${saturation}% - 8px)`,
-          top: `calc(${100 - lightness}% - 8px)`,
-          background: hslToString(hue, saturation, lightness),
-          boxShadow: "0 0 0 2px rgba(0,0,0,0.18), 0 4px 8px rgba(0,0,0,0.12)"
-        }}
-      />
-    </div>
-  );
-};
-
-type ModernBackgroundPickerProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  onColorSelect?: (color: string) => void;
-};
-
-export const ModernBackgroundPicker = ({
+const ModernBackgroundPicker = ({
   isOpen,
   onClose,
   onColorSelect,
-}: ModernBackgroundPickerProps) => {
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onColorSelect?: (color: string) => void;
+}) => {
   // Get color from store directly
   const { setBackgroundPreset, setBackgroundColor, backgroundColor } = useConfiguratorStore((s) => ({
     setBackgroundPreset: s.setBackgroundPreset,
@@ -145,20 +79,11 @@ export const ModernBackgroundPicker = ({
 
   return (
     <div className="w-full space-y-4 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-800 flex gap-2 items-center">
-          <Image className="w-4 h-4 text-sky-600" />
-          <span>Background Color</span>
-        </h3>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          className="h-8 w-8 rounded-full"
-        >
-          <X className="w-4 h-4" />
-        </Button>
-      </div>
+      <PickerHeader
+        title="Background Color"
+        icon={<Image className="w-4 h-4 text-sky-600" />}
+        onClose={onClose}
+      />
       <ColorArea
         hue={hue}
         saturation={saturation}
@@ -180,7 +105,6 @@ export const ModernBackgroundPicker = ({
           }}
         />
       </div>
-      {/* Custom color input */}
       <div>
         <label className="block text-xs font-medium text-gray-700 mb-1">Custom Color (hex/rgb/hsl)</label>
         <input
@@ -210,3 +134,5 @@ export const ModernBackgroundPicker = ({
     </div>
   );
 };
+
+export default ModernBackgroundPicker;
