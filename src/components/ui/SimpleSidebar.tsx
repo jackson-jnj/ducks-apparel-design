@@ -1,19 +1,23 @@
 
 import { useState } from "react";
-import { Upload, Settings, ChevronDown, ChevronRight, ArrowDownToLine } from "lucide-react";
+import { Upload, Settings, ChevronDown, ChevronRight, ArrowDownToLine, Play, Palette } from "lucide-react";
 import { Button } from "./button";
 import { ProductSelector } from "./ProductSelector";
 import { ModernColorPicker } from "./ModernColorPicker";
 import { ModernBackgroundPicker } from "./ModernBackgroundPicker";
-import { BackgroundControls } from "./BackgroundControls";
+import { AnimationControls } from "./AnimationControls";
+import { DesignUploader } from "./DesignUploader";
+import { DesignControls } from "./DesignControls";
+import { ExportControls } from "./ExportControls";
 import { useToast } from "@/hooks/use-toast";
 
 export const SimpleSidebar = () => {
   const [expandedSections, setExpandedSections] = useState({
     garmentColor: false,
     background: false,
-    animation: false,
-    cameraAnimation: false
+    animation: true, // Start expanded
+    designs: true, // Start expanded
+    export: false
   });
 
   const { toast } = useToast();
@@ -28,38 +32,34 @@ export const SimpleSidebar = () => {
   const handleUpload = () => {
     toast({
       title: "Upload Design",
-      description: "Upload feature coming soon!",
+      description: "Use the design upload section below to add your graphics!",
     });
   };
 
   const handleAdvanced = () => {
     toast({
       title: "Advanced Controls",
-      description: "Advanced product controls will be added soon.",
-    });
-  };
-
-  const handleExport = () => {
-    toast({
-      title: "Export",
-      description: "Export functionality coming soon - video and image export will be available!",
+      description: "Advanced product controls available in expanded sections.",
     });
   };
 
   const SectionHeader = ({
     title,
     section,
-    isPro = false
+    isPro = false,
+    icon: Icon
   }: {
     title: string;
     section: keyof typeof expandedSections;
     isPro?: boolean;
+    icon?: any;
   }) => (
     <button
       onClick={() => toggleSection(section)}
       className="w-full flex items-center justify-between p-3 hover:bg-gray-100 rounded-lg transition-colors"
     >
       <div className="flex items-center space-x-2">
+        {Icon && <Icon className="w-4 h-4 text-gray-600" />}
         <span className="text-gray-800 font-medium">{title}</span>
         {isPro && (
           <span className="bg-teal-600 text-white text-xs px-2 py-1 rounded">
@@ -83,7 +83,7 @@ export const SimpleSidebar = () => {
           onClick={handleUpload}
         >
           <Upload className="w-4 h-4" />
-          <span>Upload Your Design</span>
+          <span>Quick Upload</span>
         </Button>
 
         {/* Advanced Controls Button */}
@@ -101,7 +101,7 @@ export const SimpleSidebar = () => {
 
         {/* Collapsible Sections */}
         <div className="space-y-2">
-          <SectionHeader title="Garment Color" section="garmentColor" />
+          <SectionHeader title="Garment Color" section="garmentColor" icon={Palette} />
           {expandedSections.garmentColor && (
             <div className="pl-4 py-2">
               <ModernColorPicker />
@@ -115,33 +115,29 @@ export const SimpleSidebar = () => {
             </div>
           )}
 
-          <SectionHeader title="Animation" section="animation" isPro />
+          <SectionHeader title="Animation" section="animation" icon={Play} />
           {expandedSections.animation && (
             <div className="pl-4 py-2">
-              <p className="text-sm text-gray-600">Animation controls (Pro feature)</p>
+              <AnimationControls />
             </div>
           )}
 
-          <SectionHeader title="Camera Animation" section="cameraAnimation" isPro />
-          {expandedSections.cameraAnimation && (
+          <SectionHeader title="Designs & Graphics" section="designs" icon={Upload} />
+          {expandedSections.designs && (
+            <div className="pl-4 py-2 space-y-4">
+              <DesignUploader />
+              <DesignControls />
+            </div>
+          )}
+
+          <SectionHeader title="Export & Download" section="export" icon={ArrowDownToLine} />
+          {expandedSections.export && (
             <div className="pl-4 py-2">
-              <p className="text-sm text-gray-600">Camera animation controls (Pro feature)</p>
+              <ExportControls />
             </div>
           )}
-        </div>
-
-        {/* Export Button */}
-        <div className="pt-4">
-          <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white rounded-lg py-3"
-            onClick={handleExport}
-          >
-            Export
-          </Button>
         </div>
       </div>
     </div>
   );
 };
-
-// No extra export needed
-

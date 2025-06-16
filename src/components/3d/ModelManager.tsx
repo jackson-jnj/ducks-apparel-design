@@ -1,9 +1,11 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { useGLTF } from '@react-three/drei';
+import { useGLTF, useTexture } from '@react-three/drei';
 import { Group, Object3D, Box3, Vector3, Mesh, BoxGeometry, LineSegments, EdgesGeometry, LineBasicMaterial } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
+import { useDesignStore } from '@/store/designStore';
+import { AnimationController } from './AnimationController';
 
 // Remove debug bounding box
 const DEBUG_BBOX = false;
@@ -44,6 +46,7 @@ export const ModelManager = () => {
   const [error, setError] = useState<string | null>(null);
 
   const { selectedProduct, baseColor, cameraView } = useConfiguratorStore();
+  const { designs } = useDesignStore();
   const config = MODEL_CONFIG[selectedProduct];
 
   // Load the GLTF model
@@ -164,8 +167,29 @@ export const ModelManager = () => {
     >
       {/* Model centered at [0,0,0] */}
       <primitive object={currentModel} />
+      
+      {/* Render designs on the garment */}
+      {designs.map((design) => (
+        <mesh 
+          key={design.id}
+          position={[design.position[0], design.position[1], 0.51]}
+          rotation={[0, 0, design.rotation]}
+          scale={[design.scale[0], design.scale[1], 1]}
+        >
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial 
+            map={useTexture(design.image)} 
+            transparent 
+            opacity={design.opacity}
+          />
+        </mesh>
+      ))}
+      
       {/* Show bounding box for debugging */}
       {bboxObj && <primitive object={bboxObj} />}
+      
+      {/* Animation Controller */}
+      <AnimationController groupRef={groupRef} />
     </group>
   );
 };
