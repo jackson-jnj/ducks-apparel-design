@@ -1,14 +1,18 @@
+
 import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
 import { ModelManager } from './ModelManager';
 import { ModelLoadingSpinner } from './ModelLoader';
 import { PCFSoftShadowMap } from 'three';
+import { useConfiguratorStore } from '@/store/configuratorStore';
 
 export const Scene = () => {
+  const backgroundColor = useConfiguratorStore((state) => state.backgroundColor);
+
   return (
     <div
-      className="w-full h-full flex items-center justify-center relative bg-gradient-to-b from-[#2d3436] to-[#636e72]"
+      className="w-full h-full flex items-center justify-center relative"
       style={{
         minHeight: 0,
         minWidth: 0,
@@ -16,6 +20,7 @@ export const Scene = () => {
         maxWidth: "100vw",
         overflow: "hidden",
         margin: "0 auto",
+        background: backgroundColor, // Apply the background color from store
       }}
     >
       <Canvas

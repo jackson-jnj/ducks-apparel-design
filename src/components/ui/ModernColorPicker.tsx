@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useConfiguratorStore } from "@/store/configuratorStore";
 import { X, Palette } from "lucide-react";
 import { Button } from "./button";
@@ -22,39 +22,44 @@ const ColorArea = ({
 }) => {
   const ref = React.useRef<HTMLDivElement>(null);
 
-  // Support drag on palette area
-  useEffect(() => {
-    let down = false;
-    const handle = (e: MouseEvent) => {
-      if (!down || !ref.current) return;
-      const rect = ref.current.getBoundingClientRect();
-      const x = clamp(e.clientX - rect.left, 0, rect.width);
-      const y = clamp(e.clientY - rect.top, 0, rect.height);
-      const sat = clamp((x / rect.width) * 100, 0, 100);
-      const light = clamp(100 - (y / rect.height) * 100, 0, 100);
-      onChange(sat, light);
-    };
-    const up = () => { down = false; };
-    const downFn = () => { down = true; };
-    const area = ref.current;
-    if (area) area.addEventListener("mousedown", downFn);
-    document.addEventListener("mousemove", handle);
-    document.addEventListener("mouseup", up);
-    return () => {
-      if (area) area.removeEventListener("mousedown", downFn);
-      document.removeEventListener("mousemove", handle);
-      document.removeEventListener("mouseup", up);
-    };
-  }, [onChange]);
-
-  const onPointer = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
+  // Optimized drag handling with useCallback
+  const handleColorChange = useCallback((e: MouseEvent | React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
     const x = clamp(e.clientX - rect.left, 0, rect.width);
     const y = clamp(e.clientY - rect.top, 0, rect.height);
     const sat = clamp((x / rect.width) * 100, 0, 100);
     const light = clamp(100 - (y / rect.height) * 100, 0, 100);
     onChange(sat, light);
-  };
+  }, [onChange]);
+
+  // Support drag on palette area with improved responsiveness
+  useEffect(() => {
+    let down = false;
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!down) return;
+      handleColorChange(e);
+    };
+    
+    const handleMouseUp = () => { down = false; };
+    
+    const handleMouseDown = (e: MouseEvent) => { 
+      down = true; 
+      handleColorChange(e);
+    };
+    
+    const area = ref.current;
+    if (area) area.addEventListener("mousedown", handleMouseDown);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+    
+    return () => {
+      if (area) area.removeEventListener("mousedown", handleMouseDown);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [handleColorChange]);
 
   return (
     <div
@@ -64,11 +69,10 @@ const ColorArea = ({
         background: `linear-gradient(to right, #fff, hsl(${hue},100%,50%)), linear-gradient(to top, #000, transparent)`,
         touchAction: "none"
       }}
-      onMouseDown={onPointer}
       tabIndex={0}
     >
       <div
-        className="absolute w-4 h-4 border-2 border-white rounded-full pointer-events-none shadow-md"
+        className="absolute w-4 h-4 border-2 border-white rounded-full pointer-events-none shadow-md transition-all duration-75"
         style={{
           left: `calc(${saturation}% - 8px)`,
           top: `calc(${100 - lightness}% - 8px)`,
@@ -103,21 +107,21 @@ export const ModernColorPicker = () => {
   }, [baseColor]);
 
   // Update store and input when user interacts with color area
-  const handleColorAreaChange = (s: number, l: number) => {
+  const handleColorAreaChange = useCallback((s: number, l: number) => {
     setSaturation(s);
     setLightness(l);
     const hsl = hslToString(hue, s, l);
     setBaseColor(hsl);
     setInput(hsl);
-  };
+  }, [hue, setBaseColor]);
 
   // Update store and input when user changes hue
-  const handleHueChange = (newHue: number) => {
+  const handleHueChange = useCallback((newHue: number) => {
     setHue(newHue);
     const hsl = hslToString(newHue, saturation, lightness);
     setBaseColor(hsl);
     setInput(hsl);
-  };
+  }, [saturation, lightness, setBaseColor]);
 
   // Text input handler
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,7 +159,7 @@ export const ModernColorPicker = () => {
           max="360"
           value={hue}
           onChange={e => handleHueChange(Number(e.target.value))}
-          className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200"
+          className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 transition-all duration-75"
           style={{
             background: 'linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)'
           }}

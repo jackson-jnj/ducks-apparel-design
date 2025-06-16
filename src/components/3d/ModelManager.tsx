@@ -1,3 +1,4 @@
+
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
@@ -7,31 +8,31 @@ import { useConfiguratorStore } from '@/store/configuratorStore';
 // Remove debug bounding box
 const DEBUG_BBOX = false;
 
-// Center/scaling configuration for each model
+// Center/scaling configuration for each model - increased scale and adjusted positioning
 const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
-    scale: [3.5, 3.5, 3.5],
-    baseYOffset: -1.2,
-    collarYOffset: 0.54, // Increased from 0.42 to 0.54 for better centering
+    scale: [4.5, 4.5, 4.5], // Increased from 3.5
+    baseYOffset: -0.5, // Moved up from -1.2
+    collarYOffset: 0.64,
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
-    scale: [3.5, 3.5, 3.5],
-    baseYOffset: -1.2,
-    collarYOffset: 0.60, // Increased from 0.46 to 0.60
+    scale: [4.5, 4.5, 4.5], // Increased from 3.5
+    baseYOffset: -0.5, // Moved up from -1.2
+    collarYOffset: 0.70,
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
-    scale: [3.5, 3.5, 3.5],
-    baseYOffset: -1.18,
-    collarYOffset: 0.42, // Increased from 0.33 to 0.42
+    scale: [4.5, 4.5, 4.5], // Increased from 3.5
+    baseYOffset: -0.48, // Moved up from -1.18
+    collarYOffset: 0.52,
   },
   'hoodie': {
     path: '/hoodie_with_hood_up/scene.gltf',
-    scale: [3.3, 3.3, 3.3],
-    baseYOffset: -1.18,
-    collarYOffset: 0.38, // Increased from 0.28 to 0.38
+    scale: [4.3, 4.3, 4.3], // Increased from 3.3
+    baseYOffset: -0.48, // Moved up from -1.18
+    collarYOffset: 0.48,
   },
 } as const;
 
@@ -98,13 +99,23 @@ export const ModelManager = () => {
     setIsLoading(false);
   }, [scene, selectedProduct]);
 
-  // Apply color to model
+  // Apply color to model with improved material properties for realistic fabric appearance
   useEffect(() => {
     if (currentModel) {
       currentModel.traverse((child: any) => {
         if (child.isMesh && child.material) {
           child.material = child.material.clone();
           child.material.color.set(baseColor);
+          
+          // Improve fabric realism
+          child.material.roughness = 0.8; // More fabric-like surface
+          child.material.metalness = 0.0; // No metallic properties for fabric
+          
+          // Add subtle normal mapping effect if available
+          if (child.material.normalMap) {
+            child.material.normalScale.set(0.5, 0.5);
+          }
+          
           child.material.needsUpdate = true;
         }
       });
@@ -117,13 +128,6 @@ export const ModelManager = () => {
       const targetRotation = cameraView === 'back' ? Math.PI :
         cameraView === 'side' ? Math.PI / 2 : 0;
       groupRef.current.rotation.y = targetRotation;
-      // Debug log transforms
-      if ((window as any)._lov_modelFrames === undefined) (window as any)._lov_modelFrames = 0;
-      if (++(window as any)._lov_modelFrames % 60 === 1) {
-        console.log("groupRef transform:", groupRef.current.position, groupRef.current.rotation, groupRef.current.scale);
-        if (currentModel)
-          console.log("currentModel position:", currentModel.position, "rotation:", currentModel.rotation);
-      }
     }
   });
 
@@ -157,7 +161,6 @@ export const ModelManager = () => {
       ref={groupRef}
       scale={config.scale}
       position={groupPosition}
-      // group is now positioned so that model is exactly centered in all directions & base is visually at the bottom.
     >
       {/* Model centered at [0,0,0] */}
       <primitive object={currentModel} />

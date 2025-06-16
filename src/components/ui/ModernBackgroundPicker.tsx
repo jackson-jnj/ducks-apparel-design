@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { useConfiguratorStore } from "@/store/configuratorStore";
 import { X, Image } from "lucide-react";
 import { Button } from "./button";
@@ -18,39 +18,44 @@ const ColorArea = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  // Enable drag and pointer for robust selector movement
-  useEffect(() => {
-    let down = false;
-    const handle = (e: MouseEvent) => {
-      if (!down || !ref.current) return;
-      const rect = ref.current.getBoundingClientRect();
-      const x = clamp(e.clientX - rect.left, 0, rect.width);
-      const y = clamp(e.clientY - rect.top, 0, rect.height);
-      const sat = clamp((x / rect.width) * 100, 0, 100);
-      const light = clamp(100 - (y / rect.height) * 100, 0, 100);
-      onChange(sat, light);
-    };
-    const up = () => { down = false; };
-    const downFn = () => { down = true; };
-    const area = ref.current;
-    if (area) area.addEventListener("mousedown", downFn);
-    document.addEventListener("mousemove", handle);
-    document.addEventListener("mouseup", up);
-    return () => {
-      if (area) area.removeEventListener("mousedown", downFn);
-      document.removeEventListener("mousemove", handle);
-      document.removeEventListener("mouseup", up);
-    };
-  }, [onChange]);
-
-  const onPointer = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
+  // Optimized drag handling with useCallback
+  const handleColorChange = useCallback((e: MouseEvent | React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
     const x = clamp(e.clientX - rect.left, 0, rect.width);
     const y = clamp(e.clientY - rect.top, 0, rect.height);
     const sat = clamp((x / rect.width) * 100, 0, 100);
     const light = clamp(100 - (y / rect.height) * 100, 0, 100);
     onChange(sat, light);
-  };
+  }, [onChange]);
+
+  // Enable drag and pointer for robust selector movement
+  useEffect(() => {
+    let down = false;
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!down) return;
+      handleColorChange(e);
+    };
+    
+    const handleMouseUp = () => { down = false; };
+    
+    const handleMouseDown = (e: MouseEvent) => { 
+      down = true; 
+      handleColorChange(e);
+    };
+    
+    const area = ref.current;
+    if (area) area.addEventListener("mousedown", handleMouseDown);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+    
+    return () => {
+      if (area) area.removeEventListener("mousedown", handleMouseDown);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [handleColorChange]);
 
   return (
     <div
@@ -60,11 +65,10 @@ const ColorArea = ({
         background: `linear-gradient(to right, #fff, hsl(${hue},100%,50%)), linear-gradient(to top, #000, transparent)`,
         touchAction: "none"
       }}
-      onMouseDown={onPointer}
       tabIndex={0}
     >
       <div
-        className="absolute w-4 h-4 border-2 border-white rounded-full pointer-events-none shadow-md"
+        className="absolute w-4 h-4 border-2 border-white rounded-full pointer-events-none shadow-md transition-all duration-75"
         style={{
           left: `calc(${saturation}% - 8px)`,
           top: `calc(${100 - lightness}% - 8px)`,
@@ -93,16 +97,20 @@ export const ModernBackgroundPicker = ({
   const [lightness, setLightness] = useState(98);
   const [input, setInput] = useState<string>("");
 
-  // Whenever any color value changes, apply it instantly.
-  useEffect(() => {
-    if (!isOpen) return;
-    const colorString = hslToString(hue, saturation, lightness);
+  // Update color with useCallback for better performance
+  const updateColor = useCallback((h: number, s: number, l: number) => {
+    const colorString = hslToString(h, s, l);
     setBackgroundPreset("white");
     setBackgroundColor(colorString);
     if (onColorSelect) onColorSelect(colorString);
-    setInput(colorString); // Always keep text input in sync with current setting
-    // eslint-disable-next-line
-  }, [hue, saturation, lightness, isOpen]);
+    setInput(colorString);
+  }, [setBackgroundPreset, setBackgroundColor, onColorSelect]);
+
+  // Whenever any color value changes, apply it instantly.
+  useEffect(() => {
+    if (!isOpen) return;
+    updateColor(hue, saturation, lightness);
+  }, [hue, saturation, lightness, isOpen, updateColor]);
 
   // When opened, reset to initial
   useEffect(() => {
@@ -113,6 +121,16 @@ export const ModernBackgroundPicker = ({
       setInput(hslToString(220, 30, 98));
     }
   }, [isOpen]);
+
+  // Optimized handlers with useCallback
+  const handleColorAreaChange = useCallback((s: number, l: number) => {
+    setSaturation(s);
+    setLightness(l);
+  }, []);
+
+  const handleHueChange = useCallback((newHue: number) => {
+    setHue(newHue);
+  }, []);
 
   // Text input handler
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,7 +171,7 @@ export const ModernBackgroundPicker = ({
         hue={hue}
         saturation={saturation}
         lightness={lightness}
-        onChange={(s, l) => { setSaturation(s); setLightness(l); }}
+        onChange={handleColorAreaChange}
       />
       <div className="mb-2">
         <label className="block text-xs font-medium text-gray-700 mb-1">Hue</label>
@@ -163,8 +181,8 @@ export const ModernBackgroundPicker = ({
           min="0"
           max="360"
           value={hue}
-          onChange={e => setHue(Number(e.target.value))}
-          className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200"
+          onChange={e => handleHueChange(Number(e.target.value))}
+          className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 transition-all duration-75"
           style={{
             background: 'linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)'
           }}
@@ -200,4 +218,3 @@ export const ModernBackgroundPicker = ({
     </div>
   );
 };
-
