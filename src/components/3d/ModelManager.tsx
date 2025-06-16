@@ -1,4 +1,3 @@
-
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF, useTexture } from '@react-three/drei';
@@ -6,6 +5,8 @@ import { Group, Object3D, Box3, Vector3, Mesh, BoxGeometry, LineSegments, EdgesG
 import { useConfiguratorStore } from '@/store/configuratorStore';
 import { useDesignStore } from '@/store/designStore';
 import { AnimationController } from './AnimationController';
+import { DesignMapper } from './DesignMapper';
+import { DeformationData } from './FabricPhysics';
 
 // Remove debug bounding box
 const DEBUG_BBOX = false;
@@ -44,6 +45,7 @@ export const ModelManager = () => {
   const [bboxObj, setBboxObj] = useState<Object3D | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deformationData, setDeformationData] = useState<DeformationData | null>(null);
 
   const { selectedProduct, baseColor, cameraView } = useConfiguratorStore();
   const { designs } = useDesignStore();
@@ -110,14 +112,19 @@ export const ModelManager = () => {
           child.material = child.material.clone();
           child.material.color.set(baseColor);
           
-          // Improve fabric realism
-          child.material.roughness = 0.8; // More fabric-like surface
+          // Improve fabric realism with enhanced properties
+          child.material.roughness = 0.85; // More fabric-like surface
           child.material.metalness = 0.0; // No metallic properties for fabric
+          child.material.envMapIntensity = 0.3; // Subtle environment reflection
           
           // Add subtle normal mapping effect if available
           if (child.material.normalMap) {
-            child.material.normalScale.set(0.5, 0.5);
+            child.material.normalScale.set(0.6, 0.6);
           }
+          
+          // Enhanced fabric properties for better physics interaction
+          child.material.transparent = false;
+          child.material.side = 2; // DoubleSide for better deformation visibility
           
           child.material.needsUpdate = true;
         }
@@ -133,6 +140,10 @@ export const ModelManager = () => {
       groupRef.current.rotation.y = targetRotation;
     }
   });
+
+  const handleDeformationUpdate = (deformation: DeformationData) => {
+    setDeformationData(deformation);
+  };
 
   if (error) {
     return (
@@ -168,28 +179,20 @@ export const ModelManager = () => {
       {/* Model centered at [0,0,0] */}
       <primitive object={currentModel} />
       
-      {/* Render designs on the garment */}
-      {designs.map((design) => (
-        <mesh 
-          key={design.id}
-          position={[design.position[0], design.position[1], 0.51]}
-          rotation={[0, 0, design.rotation]}
-          scale={[design.scale[0], design.scale[1], 1]}
-        >
-          <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial 
-            map={useTexture(design.image)} 
-            transparent 
-            opacity={design.opacity}
-          />
-        </mesh>
-      ))}
+      {/* Render designs with dynamic deformation mapping */}
+      <DesignMapper 
+        deformationData={deformationData}
+        garmentScale={config.scale}
+      />
       
       {/* Show bounding box for debugging */}
       {bboxObj && <primitive object={bboxObj} />}
       
-      {/* Animation Controller */}
-      <AnimationController groupRef={groupRef} />
+      {/* Enhanced Animation Controller with fabric physics */}
+      <AnimationController 
+        groupRef={groupRef} 
+        onDeformationUpdate={handleDeformationUpdate}
+      />
     </group>
   );
 };
