@@ -1,3 +1,4 @@
+
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF, useTexture } from '@react-three/drei';
@@ -15,25 +16,25 @@ const DEBUG_BBOX = false;
 const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
-    scale: [4.5, 4.5, 4.5], // Increased from 3.5
+    scale: [4.5, 4.5, 4.5] as [number, number, number], // Explicitly typed as mutable
     baseYOffset: -0.5, // Moved up from -1.2
     collarYOffset: 0.64,
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
-    scale: [4.5, 4.5, 4.5], // Increased from 3.5
+    scale: [4.5, 4.5, 4.5] as [number, number, number], // Explicitly typed as mutable
     baseYOffset: -0.5, // Moved up from -1.2
     collarYOffset: 0.70,
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
-    scale: [4.5, 4.5, 4.5], // Increased from 3.5
+    scale: [4.5, 4.5, 4.5] as [number, number, number], // Explicitly typed as mutable
     baseYOffset: -0.48, // Moved up from -1.18
     collarYOffset: 0.52,
   },
   'hoodie': {
     path: '/hoodie_with_hood_up/scene.gltf',
-    scale: [4.3, 4.3, 4.3], // Increased from 3.3
+    scale: [4.3, 4.3, 4.3] as [number, number, number], // Explicitly typed as mutable
     baseYOffset: -0.48, // Moved up from -1.18
     collarYOffset: 0.48,
   },
