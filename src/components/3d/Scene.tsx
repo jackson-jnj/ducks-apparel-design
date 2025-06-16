@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
 import { ModelManager } from './ModelManager';
-import { ModelLoadingSpinner } from './ModelLoader';
+import { ModelLoadingSpinner } from './ModelLoadingSpinner';
 import { PCFSoftShadowMap } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 
