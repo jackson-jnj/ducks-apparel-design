@@ -5,7 +5,7 @@ import { useGLTF, useTexture } from '@react-three/drei';
 import { Group, Object3D, Box3, Vector3, Mesh, BoxGeometry, LineSegments, EdgesGeometry, LineBasicMaterial } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 import { useDesignStore } from '@/store/designStore';
-import { HyperRealisticPhysics } from './HyperRealisticPhysics';
+import { AnimationController } from './AnimationController';
 import { DesignRenderer } from './DesignRenderer';
 
 // Simplified and corrected model configuration
@@ -69,7 +69,7 @@ export const ModelManager = () => {
     setIsLoading(false);
   }, [scene, selectedProduct]);
 
-  // Apply color to model materials with enhanced fabric properties
+  // Apply color to model materials
   useEffect(() => {
     if (currentModel) {
       currentModel.traverse((child: any) => {
@@ -77,16 +77,10 @@ export const ModelManager = () => {
           child.material = child.material.clone();
           child.material.color.set(baseColor);
           
-          // Enhanced fabric properties for realism
-          child.material.roughness = 0.85;
-          child.material.metalness = 0.02;
+          // Standard fabric properties
+          child.material.roughness = 0.8;
+          child.material.metalness = 0.0;
           child.material.transparent = false;
-          child.material.envMapIntensity = 0.3;
-          
-          // Add subtle subsurface scattering effect
-          if (child.material.transmission !== undefined) {
-            child.material.transmission = 0.1;
-          }
           
           child.material.needsUpdate = true;
         }
@@ -94,23 +88,12 @@ export const ModelManager = () => {
     }
   }, [currentModel, baseColor]);
 
-  // Camera view rotation with smooth transitions
+  // Camera view rotation
   useFrame(() => {
     if (groupRef.current) {
       const targetRotation = cameraView === 'back' ? Math.PI :
         cameraView === 'side' ? Math.PI / 2 : 0;
-      
-      // Smooth camera transitions
-      const currentY = groupRef.current.rotation.y;
-      const diff = targetRotation - currentY;
-      
-      // Handle angle wrapping
-      let adjustedDiff = diff;
-      if (Math.abs(diff) > Math.PI) {
-        adjustedDiff = diff > 0 ? diff - 2 * Math.PI : diff + 2 * Math.PI;
-      }
-      
-      groupRef.current.rotation.y += adjustedDiff * 0.1;
+      groupRef.current.rotation.y = targetRotation;
     }
   });
 
@@ -144,7 +127,7 @@ export const ModelManager = () => {
     >
       <primitive object={currentModel} />
       <DesignRenderer garmentScale={config.scale} />
-      <HyperRealisticPhysics groupRef={groupRef} />
+      <AnimationController groupRef={groupRef} />
     </group>
   );
 };
