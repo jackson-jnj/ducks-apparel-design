@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Upload, Settings, ChevronDown, ChevronRight, ArrowDownToLine, Play, Palette } from "lucide-react";
 import { Button } from "./button";
@@ -8,7 +7,7 @@ import { ModernBackgroundPicker } from "./ModernBackgroundPicker";
 import { AnimationControls } from "./AnimationControls";
 import { DesignUploader } from "./DesignUploader";
 import { DesignControls } from "./DesignControls";
-import { ExportControls } from "./ExportControls";
+import { EnhancedExportControls } from "./EnhancedExportControls";
 import { useToast } from "@/hooks/use-toast";
 
 export const SimpleSidebar = () => {
@@ -76,10 +75,10 @@ export const SimpleSidebar = () => {
   );
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 h-full overflow-y-auto">
+    <div className="w-64 bg-white/95 backdrop-blur-sm border-r border-gray-200 h-full overflow-y-auto">
       <div className="p-4 space-y-3">
         {/* Upload Design Button */}
-        <Button className="w-full bg-black hover:bg-gray-800 text-white rounded-lg py-3 flex items-center justify-center space-x-2"
+        <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg py-3 flex items-center justify-center space-x-2"
           onClick={handleUpload}
         >
           <Upload className="w-4 h-4" />
@@ -133,7 +132,7 @@ export const SimpleSidebar = () => {
           <SectionHeader title="Export & Download" section="export" icon={ArrowDownToLine} />
           {expandedSections.export && (
             <div className="pl-4 py-2">
-              <ExportControls />
+              <EnhancedExportControls />
             </div>
           )}
         </div>

@@ -1,4 +1,3 @@
-
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF, useTexture } from '@react-three/drei';
@@ -8,6 +7,7 @@ import { useDesignStore } from '@/store/designStore';
 import { AnimationController } from './AnimationController';
 import { DesignMapper } from './DesignMapper';
 import { DeformationData } from './FabricPhysics';
+import { DesignRenderer } from './DesignRenderer';
 
 // Remove debug bounding box
 const DEBUG_BBOX = false;
@@ -180,11 +180,8 @@ export const ModelManager = () => {
       {/* Model centered at [0,0,0] */}
       <primitive object={currentModel} />
       
-      {/* Render designs with dynamic deformation mapping */}
-      <DesignMapper 
-        deformationData={deformationData}
-        garmentScale={config.scale}
-      />
+      {/* Enhanced design rendering system */}
+      <DesignRenderer garmentScale={config.scale} />
       
       {/* Show bounding box for debugging */}
       {bboxObj && <primitive object={bboxObj} />}
