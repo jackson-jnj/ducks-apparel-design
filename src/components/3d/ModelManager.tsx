@@ -12,22 +12,22 @@ import { DesignRenderer } from './DesignRenderer';
 const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
-    scale: [15, 15, 15] as [number, number, number], // Much bigger
+    scale: [20, 20, 20] as [number, number, number], // Even bigger
     yOffset: 0,
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
-    scale: [15, 15, 15] as [number, number, number], // Much bigger
+    scale: [20, 20, 20] as [number, number, number], // Even bigger
     yOffset: 0,
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
-    scale: [15, 15, 15] as [number, number, number], // Much bigger
+    scale: [20, 20, 20] as [number, number, number], // Even bigger
     yOffset: 0,
   },
   'hoodie': {
     path: '/hoodie_with_hood_up/scene.gltf',
-    scale: [15, 15, 15] as [number, number, number], // Much bigger
+    scale: [20, 20, 20] as [number, number, number], // Even bigger
     yOffset: 0,
   },
 } as const;
@@ -105,7 +105,7 @@ export const ModelManager = () => {
     return (
       <group>
         <mesh position={[0, 0, 0]}>
-          <boxGeometry args={[4, 6, 0.4]} />
+          <boxGeometry args={[6, 8, 0.6]} />
           <meshStandardMaterial color="#ff6b6b" />
         </mesh>
       </group>
@@ -116,7 +116,7 @@ export const ModelManager = () => {
     return (
       <group>
         <mesh position={[0, 0, 0]}>
-          <boxGeometry args={[4, 6, 0.4]} />
+          <boxGeometry args={[6, 8, 0.6]} />
           <meshStandardMaterial color="#cccccc" />
         </mesh>
       </group>
