@@ -1,34 +1,34 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { useGLTF } from '@react-three/drei';
-import { Group, Object3D, Box3, Vector3 } from 'three';
+import { useGLTF, useTexture } from '@react-three/drei';
+import { Group, Object3D, Box3, Vector3, Mesh, BoxGeometry, LineSegments, EdgesGeometry, LineBasicMaterial } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 import { useDesignStore } from '@/store/designStore';
 import { AnimationController } from './AnimationController';
 import { DesignRenderer } from './DesignRenderer';
 
-// Updated model configuration with much larger scales and proper centering
+// Simplified and corrected model configuration
 const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
-    scale: [8, 8, 8] as [number, number, number], // Much bigger
-    yOffset: 0, // Center vertically
+    scale: [3, 3, 3] as [number, number, number],
+    yOffset: -1.5,
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
-    scale: [8, 8, 8] as [number, number, number], // Much bigger
-    yOffset: 0, // Center vertically
+    scale: [3, 3, 3] as [number, number, number],
+    yOffset: -1.5,
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
-    scale: [8, 8, 8] as [number, number, number], // Much bigger
-    yOffset: 0, // Center vertically
+    scale: [3, 3, 3] as [number, number, number],
+    yOffset: -1.5,
   },
   'hoodie': {
     path: '/hoodie_with_hood_up/scene.gltf',
-    scale: [8, 8, 8] as [number, number, number], // Much bigger
-    yOffset: 0, // Center vertically
+    scale: [3, 3, 3] as [number, number, number],
+    yOffset: -1.5,
   },
 } as const;
 
@@ -62,7 +62,7 @@ export const ModelManager = () => {
     const bbox = new Box3().setFromObject(model);
     const center = bbox.getCenter(new Vector3());
     
-    // Center the model at origin (0,0,0)
+    // Center the model at origin
     model.position.set(-center.x, -center.y, -center.z);
     
     setCurrentModel(model);
@@ -100,8 +100,8 @@ export const ModelManager = () => {
   if (error) {
     return (
       <group>
-        <mesh position={[0, 0, 0]}>
-          <boxGeometry args={[2, 3, 0.2]} />
+        <mesh>
+          <boxGeometry args={[1, 1.5, 0.1]} />
           <meshStandardMaterial color="#ff6b6b" />
         </mesh>
       </group>
@@ -111,8 +111,8 @@ export const ModelManager = () => {
   if (isLoading || !currentModel) {
     return (
       <group>
-        <mesh position={[0, 0, 0]}>
-          <boxGeometry args={[2, 3, 0.2]} />
+        <mesh>
+          <boxGeometry args={[1, 1.5, 0.1]} />
           <meshStandardMaterial color="#cccccc" />
         </mesh>
       </group>
@@ -123,7 +123,7 @@ export const ModelManager = () => {
     <group
       ref={groupRef}
       scale={config.scale}
-      position={[0, config.yOffset, 0]} // Centered at origin
+      position={[0, config.yOffset, 0]}
     >
       <primitive object={currentModel} />
       <DesignRenderer garmentScale={config.scale} />

@@ -20,13 +20,13 @@ export const Scene = () => {
         maxWidth: "100vw",
         overflow: "hidden",
         margin: "0 auto",
-        background: backgroundColor,
+        background: backgroundColor, // Apply the background color from store
       }}
     >
       <Canvas
         camera={{
-          position: [0, 0, 15], // Moved camera back to accommodate larger models
-          fov: 35, // Slightly wider field of view
+          position: [0, 0.5, 8],
+          fov: 32,
           near: 0.1,
           far: 1000,
         }}
@@ -44,11 +44,11 @@ export const Scene = () => {
         }}
       >
         <Suspense fallback={<ModelLoadingSpinner />}>
-          {/* Enhanced lighting setup for larger models */}
-          <ambientLight intensity={0.5} />
+          {/* Lighting setup optimized for dark background */}
+          <ambientLight intensity={0.4} />
           <directionalLight
             position={[10, 10, 5]}
-            intensity={2.5}
+            intensity={2}
             castShadow
             shadow-mapSize-width={2048}
             shadow-mapSize-height={2048}
@@ -56,45 +56,45 @@ export const Scene = () => {
           
           {/* Fill light */}
           <directionalLight
-            position={[-8, 8, -8]}
-            intensity={1.2}
+            position={[-5, 5, -5]}
+            intensity={0.8}
             color="#ffffff"
           />
           
           {/* Rim light for better definition */}
           <directionalLight
-            position={[0, 0, -15]}
-            intensity={1.5}
+            position={[0, 0, -10]}
+            intensity={1}
             color="#74b9ff"
           />
 
           {/* Environment lighting */}
           <Environment preset="studio" background={false} />
 
-          {/* Centered and enlarged model */}
+          {/* Model with new loading system */}
           <ModelManager />
 
-          {/* Ground shadows positioned lower for bigger models */}
+          {/* Ground shadows */}
           <ContactShadows
             rotation-x={Math.PI / 2}
-            position={[0, -4, 0]}
+            position={[0, -2.5, 0]}
             opacity={0.4}
-            width={12}
-            height={12}
+            width={8}
+            height={8}
             blur={2}
-            far={6}
+            far={4}
           />
 
-          {/* Orbit controls adjusted for larger models */}
+          {/* Orbit controls - hyper responsive, no inertia */}
           <OrbitControls
             enablePan={false}
             enableZoom={true}
             enableRotate={true}
-            minDistance={8}
-            maxDistance={25}
+            minDistance={2}
+            maxDistance={30}
             minPolarAngle={Math.PI / 6}
             maxPolarAngle={Math.PI - Math.PI / 6}
-            target={[0, 0, 0]} // Target the center where models are positioned
+            target={[0, 0, 0]}
             autoRotate={false}
             enableDamping={false}
           />
