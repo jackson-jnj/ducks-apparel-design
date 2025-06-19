@@ -8,27 +8,27 @@ import { useDesignStore } from '@/store/designStore';
 import { AnimationController } from './AnimationController';
 import { DesignRenderer } from './DesignRenderer';
 
-// Much larger model configuration for better visibility
+// Updated model configuration with much larger scales and proper centering
 const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
-    scale: [15, 15, 15] as [number, number, number], // Much bigger
-    yOffset: 0,
+    scale: [8, 8, 8] as [number, number, number], // Much bigger
+    yOffset: 0, // Center vertically
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
-    scale: [15, 15, 15] as [number, number, number], // Much bigger
-    yOffset: 0,
+    scale: [8, 8, 8] as [number, number, number], // Much bigger
+    yOffset: 0, // Center vertically
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
-    scale: [15, 15, 15] as [number, number, number], // Much bigger
-    yOffset: 0,
+    scale: [8, 8, 8] as [number, number, number], // Much bigger
+    yOffset: 0, // Center vertically
   },
   'hoodie': {
     path: '/hoodie_with_hood_up/scene.gltf',
-    scale: [15, 15, 15] as [number, number, number], // Much bigger
-    yOffset: 0,
+    scale: [8, 8, 8] as [number, number, number], // Much bigger
+    yOffset: 0, // Center vertically
   },
 } as const;
 
@@ -55,8 +55,6 @@ export const ModelManager = () => {
       return;
     }
 
-    console.log(`Loading model: ${selectedProduct} with scale:`, config.scale);
-
     // Clone and center the model properly
     const model = scene.clone(true);
     
@@ -69,9 +67,7 @@ export const ModelManager = () => {
     
     setCurrentModel(model);
     setIsLoading(false);
-    
-    console.log(`Model ${selectedProduct} loaded successfully with bbox:`, bbox);
-  }, [scene, selectedProduct, config.scale]);
+  }, [scene, selectedProduct]);
 
   // Apply color to model materials
   useEffect(() => {
@@ -105,7 +101,7 @@ export const ModelManager = () => {
     return (
       <group>
         <mesh position={[0, 0, 0]}>
-          <boxGeometry args={[4, 6, 0.4]} />
+          <boxGeometry args={[2, 3, 0.2]} />
           <meshStandardMaterial color="#ff6b6b" />
         </mesh>
       </group>
@@ -116,7 +112,7 @@ export const ModelManager = () => {
     return (
       <group>
         <mesh position={[0, 0, 0]}>
-          <boxGeometry args={[4, 6, 0.4]} />
+          <boxGeometry args={[2, 3, 0.2]} />
           <meshStandardMaterial color="#cccccc" />
         </mesh>
       </group>
@@ -127,7 +123,7 @@ export const ModelManager = () => {
     <group
       ref={groupRef}
       scale={config.scale}
-      position={[0, config.yOffset, 0]}
+      position={[0, config.yOffset, 0]} // Centered at origin
     >
       <primitive object={currentModel} />
       <DesignRenderer garmentScale={config.scale} />

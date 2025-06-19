@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Upload, Settings, ChevronDown, ChevronRight, ArrowDownToLine, Play, Palette, Camera } from "lucide-react";
+import { Upload, Settings, ChevronDown, ChevronRight, ArrowDownToLine, Play, Palette } from "lucide-react";
 import { Button } from "./button";
 import { ProductSelector } from "./ProductSelector";
 import { ModernColorPicker } from "./ModernColorPicker";
@@ -9,16 +8,14 @@ import { AnimationControls } from "./AnimationControls";
 import { DesignUploader } from "./DesignUploader";
 import { DesignControls } from "./DesignControls";
 import { EnhancedExportControls } from "./EnhancedExportControls";
-import { ViewControls } from "./ViewControls";
 import { useToast } from "@/hooks/use-toast";
 
 export const SimpleSidebar = () => {
   const [expandedSections, setExpandedSections] = useState({
     garmentColor: false,
     background: false,
-    view: true, // Add view controls
-    animation: true,
-    designs: true,
+    animation: true, // Start expanded
+    designs: true, // Start expanded
     export: false
   });
 
@@ -33,15 +30,15 @@ export const SimpleSidebar = () => {
 
   const handleUpload = () => {
     toast({
-      title: "Quick Upload",
-      description: "Use the 'Designs & Graphics' section below to upload your images and designs!",
+      title: "Upload Design",
+      description: "Use the design upload section below to add your graphics!",
     });
   };
 
   const handleAdvanced = () => {
     toast({
       title: "Advanced Controls",
-      description: "Expand the sections below to access all customization options.",
+      description: "Advanced product controls available in expanded sections.",
     });
   };
 
@@ -62,7 +59,7 @@ export const SimpleSidebar = () => {
     >
       <div className="flex items-center space-x-2">
         {Icon && <Icon className="w-4 h-4 text-gray-600" />}
-        <span className="text-gray-800 font-medium text-sm">{title}</span>
+        <span className="text-gray-800 font-medium">{title}</span>
         {isPro && (
           <span className="bg-teal-600 text-white text-xs px-2 py-1 rounded">
             Pro
@@ -80,23 +77,20 @@ export const SimpleSidebar = () => {
   return (
     <div className="w-64 bg-white/95 backdrop-blur-sm border-r border-gray-200 h-full overflow-y-auto">
       <div className="p-4 space-y-3">
-        {/* Upload Design Button with content */}
-        <Button 
-          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg py-3 flex items-center justify-center space-x-2"
+        {/* Upload Design Button */}
+        <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg py-3 flex items-center justify-center space-x-2"
           onClick={handleUpload}
         >
           <Upload className="w-4 h-4" />
-          <span>Quick Upload Design</span>
+          <span>Quick Upload</span>
         </Button>
 
-        {/* Advanced Controls Button with content */}
-        <Button 
-          variant="outline" 
-          className="w-full border-gray-300 text-gray-700 rounded-lg py-3 flex items-center justify-center space-x-2"
+        {/* Advanced Controls Button */}
+        <Button variant="outline" className="w-full border-gray-300 text-gray-700 rounded-lg py-3 flex items-center justify-center space-x-2"
           onClick={handleAdvanced}
         >
           <Settings className="w-4 h-4" />
-          <span>Advanced Options</span>
+          <span>Advanced Controls</span>
         </Button>
 
         {/* Product Selection */}
@@ -110,13 +104,6 @@ export const SimpleSidebar = () => {
           {expandedSections.garmentColor && (
             <div className="pl-4 py-2">
               <ModernColorPicker />
-            </div>
-          )}
-
-          <SectionHeader title="View & Camera" section="view" icon={Camera} />
-          {expandedSections.view && (
-            <div className="pl-4 py-2">
-              <ViewControls />
             </div>
           )}
 
