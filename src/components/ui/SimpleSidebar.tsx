@@ -31,39 +31,17 @@ export const SimpleSidebar = () => {
     }));
   };
 
-  const handleQuickUpload = () => {
-    // Automatically expand the designs section and show instructions
-    setExpandedSections(prev => ({ ...prev, designs: true }));
+  const handleUpload = () => {
     toast({
-      title: "Design Upload Ready!",
-      description: "The 'Designs & Graphics' section is now open below. Use the upload area to add your images!",
-      duration: 5000,
+      title: "Quick Upload",
+      description: "Use the 'Designs & Graphics' section below to upload your images and designs!",
     });
-    
-    // Scroll to designs section
-    setTimeout(() => {
-      const designsSection = document.querySelector('[data-section="designs"]');
-      if (designsSection) {
-        designsSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 100);
   };
 
-  const handleAdvancedOptions = () => {
-    // Expand all collapsed sections
-    setExpandedSections({
-      garmentColor: true,
-      background: true,
-      view: true,
-      animation: true,
-      designs: true,
-      export: true
-    });
-    
+  const handleAdvanced = () => {
     toast({
-      title: "Advanced Options Unlocked!",
-      description: "All customization sections are now expanded for full control.",
-      duration: 3000,
+      title: "Advanced Controls",
+      description: "Expand the sections below to access all customization options.",
     });
   };
 
@@ -81,7 +59,6 @@ export const SimpleSidebar = () => {
     <button
       onClick={() => toggleSection(section)}
       className="w-full flex items-center justify-between p-3 hover:bg-gray-100 rounded-lg transition-colors"
-      data-section={section}
     >
       <div className="flex items-center space-x-2">
         {Icon && <Icon className="w-4 h-4 text-gray-600" />}
@@ -103,20 +80,20 @@ export const SimpleSidebar = () => {
   return (
     <div className="w-64 bg-white/95 backdrop-blur-sm border-r border-gray-200 h-full overflow-y-auto">
       <div className="p-4 space-y-3">
-        {/* Quick Upload Design Button with real functionality */}
+        {/* Upload Design Button with content */}
         <Button 
           className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg py-3 flex items-center justify-center space-x-2"
-          onClick={handleQuickUpload}
+          onClick={handleUpload}
         >
           <Upload className="w-4 h-4" />
           <span>Quick Upload Design</span>
         </Button>
 
-        {/* Advanced Controls Button with real functionality */}
+        {/* Advanced Controls Button with content */}
         <Button 
           variant="outline" 
           className="w-full border-gray-300 text-gray-700 rounded-lg py-3 flex items-center justify-center space-x-2"
-          onClick={handleAdvancedOptions}
+          onClick={handleAdvanced}
         >
           <Settings className="w-4 h-4" />
           <span>Advanced Options</span>
@@ -159,7 +136,7 @@ export const SimpleSidebar = () => {
 
           <SectionHeader title="Designs & Graphics" section="designs" icon={Upload} />
           {expandedSections.designs && (
-            <div className="pl-4 py-2 space-y-4" data-section="designs">
+            <div className="pl-4 py-2 space-y-4">
               <DesignUploader />
               <DesignControls />
             </div>

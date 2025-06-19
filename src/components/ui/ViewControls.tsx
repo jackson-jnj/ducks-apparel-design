@@ -30,11 +30,10 @@ export const ViewControls = () => {
     // This would typically trigger a camera animation to fit the model
   };
 
-  const handleZoomHelp = () => {
+  const handleZoomIn = () => {
     toast({
-      title: "Zoom Controls",
-      description: "Use mouse wheel or trackpad to zoom in/out. Click and drag to rotate the model.",
-      duration: 4000,
+      title: "Zoom In",
+      description: "Use mouse wheel or trackpad to zoom in/out.",
     });
   };
 
@@ -86,9 +85,9 @@ export const ViewControls = () => {
         <Button
           variant="outline"
           size="sm"
-          onClick={handleZoomHelp}
+          onClick={handleZoomIn}
           className="flex-1 flex items-center gap-1"
-          title="How to zoom and rotate"
+          title="Zoom controls help"
         >
           <Camera className="w-3 h-3" />
           <span className="text-xs">Zoom Help</span>
