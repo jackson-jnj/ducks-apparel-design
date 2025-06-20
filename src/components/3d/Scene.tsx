@@ -20,7 +20,7 @@ export const Scene = () => {
         maxWidth: "100vw",
         overflow: "hidden",
         margin: "0 auto",
-        background: backgroundColor, // Apply the background color from store
+        background: backgroundColor,
       }}
     >
       <Canvas
@@ -44,11 +44,11 @@ export const Scene = () => {
         }}
       >
         <Suspense fallback={<ModelLoadingSpinner />}>
-          {/* Lighting setup optimized for dark background */}
-          <ambientLight intensity={0.4} />
+          {/* Optimized lighting setup */}
+          <ambientLight intensity={0.6} />
           <directionalLight
             position={[10, 10, 5]}
-            intensity={2}
+            intensity={1.5}
             castShadow
             shadow-mapSize-width={2048}
             shadow-mapSize-height={2048}
@@ -60,18 +60,11 @@ export const Scene = () => {
             intensity={0.8}
             color="#ffffff"
           />
-          
-          {/* Rim light for better definition */}
-          <directionalLight
-            position={[0, 0, -10]}
-            intensity={1}
-            color="#74b9ff"
-          />
 
           {/* Environment lighting */}
           <Environment preset="studio" background={false} />
 
-          {/* Model with new loading system */}
+          {/* Model with simplified loading system */}
           <ModelManager />
 
           {/* Ground shadows */}
@@ -85,7 +78,7 @@ export const Scene = () => {
             far={4}
           />
 
-          {/* Orbit controls - hyper responsive, no inertia */}
+          {/* Orbit controls */}
           <OrbitControls
             enablePan={false}
             enableZoom={true}
@@ -96,7 +89,8 @@ export const Scene = () => {
             maxPolarAngle={Math.PI - Math.PI / 6}
             target={[0, 0, 0]}
             autoRotate={false}
-            enableDamping={false}
+            enableDamping={true}
+            dampingFactor={0.05}
           />
         </Suspense>
       </Canvas>
