@@ -1,148 +1,132 @@
 
 import { Button } from "./button";
-import { ArrowRight, Play, Sparkles } from "lucide-react";
+import { ArrowRight, Play, Sparkles, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const ModernHero = () => {
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50 overflow-hidden">
-      {/* Subtle animated background elements */}
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
+      {/* Animated background elements */}
       <div className="absolute inset-0">
-        <div className="absolute top-20 left-20 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-        <div className="absolute top-40 right-20 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-40 w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+        <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute top-40 right-20 w-72 h-72 bg-yellow-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-40 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      {/* Subtle grid pattern */}
-      <div className="absolute inset-0 opacity-30" style={{
-        backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000' fill-opacity='0.03'%3E%3Cpath d='M0 0h40v40H0z'/%3E%3C/g%3E%3C/svg%3E\")"
-      }}></div>
+      {/* Grid pattern overlay */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
 
-      <div className="relative z-10 container mx-auto px-6 py-20">
-        <div className="flex flex-col lg:flex-row items-center justify-between min-h-[80vh] gap-16">
-          
+      <div className="relative z-10 container mx-auto px-6 py-16">
+        <div className="flex flex-col lg:flex-row items-center justify-between min-h-[80vh]">
           {/* Left side - Content */}
-          <div className="flex-1 max-w-3xl text-center lg:text-left">
-            
-            {/* Innovation Badge */}
-            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-100 to-blue-100 border border-purple-200 rounded-full px-5 py-3 mb-8 shadow-sm">
-              <Sparkles className="w-5 h-5 text-purple-600" />
-              <span className="text-purple-700 text-sm font-semibold tracking-wide">AI-POWERED 3D MOCKUPS</span>
-              <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+          <div className="flex-1 max-w-3xl mb-12 lg:mb-0">
+            {/* Badge */}
+            <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-8">
+              <Sparkles className="w-4 h-4 text-yellow-400" />
+              <span className="text-white/90 text-sm font-medium">AI-Powered 3D Mockups</span>
+              <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-2 py-1 rounded-full text-xs font-bold">
                 NEW
               </div>
             </div>
 
-            {/* Power Headline */}
-            <h1 className="text-5xl lg:text-7xl font-bold text-slate-900 mb-8 leading-[1.1] font-sans">
-              Design Real Garments
-              <br />
-              <span className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                in Real Time
+            {/* Main headline */}
+            <h1 className="text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+              Create Stunning
+              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-yellow-400 bg-clip-text text-transparent">
+                {" "}3D Mockups
               </span>
+              <br />
+              in Seconds
             </h1>
 
-            {/* Subheadline */}
-            <p className="text-xl lg:text-2xl text-slate-600 mb-4 leading-relaxed max-w-2xl font-light">
-              Ultra-realistic 3D apparel visualization, powered by AI.
-            </p>
-            
-            <p className="text-lg text-slate-500 mb-12 leading-relaxed max-w-2xl">
-              Upload your design, pick colors, and see it live on lifelike 3D models — all in seconds. 
-              Perfect for fashion brands, creators, and visionaries.
+            {/* Description */}
+            <p className="text-xl text-white/80 mb-8 leading-relaxed max-w-2xl">
+              Transform your designs into photorealistic 3D garments with{" "}
+              <span className="text-purple-300 font-semibold">AI-powered animations</span>,{" "}
+              <span className="text-pink-300 font-semibold">fabric physics</span>, and{" "}
+              <span className="text-yellow-300 font-semibold">cinematic exports</span>.
             </p>
 
-            {/* Trust Statistics */}
-            <div className="flex flex-wrap justify-center lg:justify-start items-center gap-8 mb-12">
+            {/* Stats */}
+            <div className="flex items-center space-x-8 mb-8">
               <div className="text-center">
-                <div className="text-3xl font-bold text-slate-900">120K+</div>
-                <div className="text-slate-500 text-sm font-medium">Active Designers</div>
+                <div className="text-3xl font-bold text-white">120K+</div>
+                <div className="text-white/60 text-sm">Active Designers</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-slate-900">5M+</div>
-                <div className="text-slate-500 text-sm font-medium">Mockups Created</div>
+                <div className="text-3xl font-bold text-white">5M+</div>
+                <div className="text-white/60 text-sm">Mockups Created</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-slate-900">99.9%</div>
-                <div className="text-slate-500 text-sm font-medium">Satisfaction Rate</div>
+                <div className="text-3xl font-bold text-white">99.9%</div>
+                <div className="text-white/60 text-sm">Satisfaction Rate</div>
               </div>
             </div>
 
-            {/* Primary & Secondary CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-12">
+            {/* CTA buttons */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
               <Link to="/configurator">
                 <Button 
                   size="lg"
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-10 py-4 text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group border-0 font-semibold"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group"
                 >
-                  Launch Designer
-                  <ArrowRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
+                  Start Creating Now
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              
               <Button 
                 variant="outline"
                 size="lg"
-                className="border-2 border-slate-300 text-slate-700 hover:bg-slate-50 px-10 py-4 text-lg rounded-2xl font-semibold transition-all duration-300"
+                className="border-white/30 text-white hover:bg-white/10 px-8 py-4 text-lg rounded-xl backdrop-blur-sm"
               >
                 <Play className="w-5 h-5 mr-2" />
-                See Examples
+                Watch Demo
               </Button>
             </div>
 
-            {/* Trust Indicators */}
-            <div className="text-center lg:text-left">
-              <p className="text-slate-400 text-sm mb-4 font-medium">Trusted by leading brands worldwide</p>
-              <div className="flex flex-wrap justify-center lg:justify-start items-center gap-8 opacity-60">
-                <div className="font-bold text-xl text-slate-700 tracking-wide">NIKE</div>
-                <div className="font-bold text-xl text-slate-700 tracking-wide">ADIDAS</div>
-                <div className="font-bold text-xl text-slate-700 tracking-wide">SUPREME</div>
-                <div className="font-bold text-xl text-slate-700 tracking-wide">UNIQLO</div>
+            {/* Trust indicators */}
+            <div className="mt-12 text-white/60 text-sm">
+              <p className="mb-3">Trusted by leading brands worldwide</p>
+              <div className="flex items-center space-x-8 opacity-60">
+                <div className="font-bold text-lg">NIKE</div>
+                <div className="font-bold text-lg">ADIDAS</div>
+                <div className="font-bold text-lg">SUPREME</div>
+                <div className="font-bold text-lg">UNIQLO</div>
               </div>
             </div>
           </div>
 
-          {/* Right side - Interactive 3D Preview */}
+          {/* Right side - 3D Preview Card */}
           <div className="flex-1 flex justify-center lg:justify-end">
-            <div className="relative group">
+            <div className="relative">
+              {/* Glowing orb background */}
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/30 to-pink-500/30 rounded-full blur-3xl scale-150"></div>
               
-              {/* Glowing background effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-blue-400/20 rounded-3xl blur-2xl scale-110 group-hover:scale-125 transition-transform duration-700"></div>
-              
-              {/* Main preview container */}
-              <div className="relative bg-white/80 backdrop-blur-xl border border-white/40 rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500">
-                
-                {/* 3D Preview Area */}
-                <div className="w-96 h-[500px] bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center overflow-hidden relative group">
-                  
-                  {/* Animated 3D Mockup */}
-                  <div className="relative transform group-hover:scale-105 transition-all duration-700">
-                    <div className="w-52 h-72 bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-xl shadow-2xl relative overflow-hidden">
-                      
-                      {/* T-shirt shape */}
-                      <div className="absolute inset-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-inner">
-                        <div className="w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center">
-                          <Sparkles className="w-8 h-8 text-white" />
-                        </div>
+              {/* Main preview card */}
+              <div className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
+                <div className="w-80 h-96 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl flex items-center justify-center overflow-hidden relative">
+                  {/* 3D mockup placeholder with animation */}
+                  <div className="relative">
+                    <div className="w-48 h-64 bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400 rounded-lg shadow-lg transform hover:rotate-3 transition-all duration-500 hover:scale-105">
+                      <div className="absolute inset-0 bg-black/10 rounded-lg"></div>
+                      <div className="absolute top-16 left-1/2 transform -translate-x-1/2 w-24 h-16 bg-white/20 rounded-lg flex items-center justify-center">
+                        <Zap className="w-8 h-8 text-orange-800" />
                       </div>
-                      
                       {/* Floating design elements */}
-                      <div className="absolute -top-3 -right-3 w-8 h-8 bg-yellow-400 rounded-full animate-bounce shadow-lg"></div>
-                      <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-pink-500 rounded-full animate-pulse shadow-lg"></div>
-                      <div className="absolute top-1/2 -left-3 w-4 h-4 bg-green-400 rounded-full animate-ping shadow-lg"></div>
+                      <div className="absolute -top-4 -right-4 w-8 h-8 bg-purple-500 rounded-full animate-bounce"></div>
+                      <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-pink-500 rounded-full animate-pulse"></div>
                     </div>
                     
-                    {/* Floating UI Elements */}
+                    {/* Floating particles */}
                     <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-                      {[...Array(8)].map((_, i) => (
+                      {[...Array(6)].map((_, i) => (
                         <div
                           key={i}
-                          className="absolute w-1 h-1 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full opacity-60 animate-float"
+                          className={`absolute w-2 h-2 bg-white rounded-full opacity-40 animate-float`}
                           style={{
                             left: `${Math.random() * 100}%`,
                             top: `${Math.random() * 100}%`,
-                            animationDelay: `${i * 0.7}s`,
-                            animationDuration: `${3 + Math.random() * 2}s`
+                            animationDelay: `${i * 0.5}s`
                           }}
                         ></div>
                       ))}
@@ -150,26 +134,10 @@ export const ModernHero = () => {
                   </div>
                 </div>
                 
-                {/* Preview Info */}
-                <div className="mt-8 text-center">
-                  <h3 className="text-slate-900 font-bold text-xl mb-2">Live 3D Preview</h3>
-                  <p className="text-slate-500 text-sm font-medium">Real-time rendering with AI physics</p>
-                  
-                  {/* Feature indicators */}
-                  <div className="flex justify-center gap-4 mt-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-xs text-slate-600 font-medium">Live</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                      <span className="text-xs text-slate-600 font-medium">Interactive</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-                      <span className="text-xs text-slate-600 font-medium">AI-Powered</span>
-                    </div>
-                  </div>
+                {/* Card footer */}
+                <div className="mt-6 text-center">
+                  <h3 className="text-white font-semibold text-lg mb-2">Live 3D Preview</h3>
+                  <p className="text-white/60 text-sm">Real-time rendering with physics</p>
                 </div>
               </div>
             </div>
@@ -178,7 +146,7 @@ export const ModernHero = () => {
       </div>
 
       {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-900 to-transparent"></div>
     </div>
   );
 };

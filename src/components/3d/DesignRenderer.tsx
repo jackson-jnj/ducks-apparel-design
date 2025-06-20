@@ -16,8 +16,8 @@ export const DesignRenderer = ({ garmentScale }: DesignRendererProps) => {
   const meshRefs = useRef<{ [key: string]: Mesh }>({});
   const { scene } = useThree();
 
-  // Calculate position based on camera view - properly typed as Vector3 tuple
-  const getPositionForView = (design: any): [number, number, number] => {
+  // Calculate position based on camera view
+  const getPositionForView = (design: any) => {
     const baseZ = 0.51; // Always in front of garment
     const [x, y] = design.position;
     
