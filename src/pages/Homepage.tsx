@@ -1,10 +1,10 @@
 
-import { ModernHero } from "@/components/ui/ModernHero";
+import { GlassmorphismHero } from "@/components/ui/GlassmorphismHero";
 
 const Homepage = () => {
   return (
     <div className="min-h-screen">
-      <ModernHero />
+      <GlassmorphismHero />
     </div>
   );
 };
