@@ -1,52 +1,42 @@
+
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { useGLTF, useTexture } from '@react-three/drei';
-import { Group, Object3D, Box3, Vector3, Mesh, BoxGeometry, LineSegments, EdgesGeometry, LineBasicMaterial } from 'three';
+import { useGLTF } from '@react-three/drei';
+import { Group, Object3D, Box3, Vector3 } from 'three';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 import { useDesignStore } from '@/store/designStore';
 import { AnimationController } from './AnimationController';
-import { DesignMapper } from './DesignMapper';
-import { DeformationData } from './FabricPhysics';
 import { DesignRenderer } from './DesignRenderer';
 
-// Remove debug bounding box
-const DEBUG_BBOX = false;
-
-// Center/scaling configuration for each model - increased scale and adjusted positioning
+// Much larger model configuration for better visibility
 const MODEL_CONFIG = {
   'short-sleeve-tshirt': {
     path: '/oversized_t-shirt/scene.gltf',
-    scale: [4.5, 4.5, 4.5] as [number, number, number], // Explicitly typed as mutable
-    baseYOffset: -0.5, // Moved up from -1.2
-    collarYOffset: 0.64,
+    scale: [20, 20, 20] as [number, number, number], // Even bigger
+    yOffset: 0,
   },
   'long-sleeve-tshirt': {
     path: '/long_sleeve_shirt/scene.gltf',
-    scale: [4.5, 4.5, 4.5] as [number, number, number], // Explicitly typed as mutable
-    baseYOffset: -0.5, // Moved up from -1.2
-    collarYOffset: 0.70,
+    scale: [20, 20, 20] as [number, number, number], // Even bigger
+    yOffset: 0,
   },
   'short-sleeve-polo': {
     path: '/short_sleeve_polo/scene.gltf',
-    scale: [4.5, 4.5, 4.5] as [number, number, number], // Explicitly typed as mutable
-    baseYOffset: -0.48, // Moved up from -1.18
-    collarYOffset: 0.52,
+    scale: [20, 20, 20] as [number, number, number], // Even bigger
+    yOffset: 0,
   },
   'hoodie': {
     path: '/hoodie_with_hood_up/scene.gltf',
-    scale: [4.3, 4.3, 4.3] as [number, number, number], // Explicitly typed as mutable
-    baseYOffset: -0.48, // Moved up from -1.18
-    collarYOffset: 0.48,
+    scale: [20, 20, 20] as [number, number, number], // Even bigger
+    yOffset: 0,
   },
 } as const;
 
 export const ModelManager = () => {
   const groupRef = useRef<Group>(null);
   const [currentModel, setCurrentModel] = useState<Object3D | null>(null);
-  const [bboxObj, setBboxObj] = useState<Object3D | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [deformationData, setDeformationData] = useState<DeformationData | null>(null);
 
   const { selectedProduct, baseColor, cameraView } = useConfiguratorStore();
   const { designs } = useDesignStore();
@@ -65,47 +55,25 @@ export const ModelManager = () => {
       return;
     }
 
-    // Clone the loaded scene
-    const model = scene.clone(true);
+    console.log(`Loading model: ${selectedProduct} with scale:`, config.scale);
 
-    // Center the model: compute bounding box, center vertically & horizontally at [0,0,0]
+    // Clone and center the model properly
+    const model = scene.clone(true);
+    
+    // Calculate bounding box and center the model
     const bbox = new Box3().setFromObject(model);
     const center = bbox.getCenter(new Vector3());
-    const size = bbox.getSize(new Vector3());
-
-    // Center the model at origin
+    
+    // Center the model at origin (0,0,0)
     model.position.set(-center.x, -center.y, -center.z);
-
-    // For debug visualization, make a wireframe box
-    if (DEBUG_BBOX) {
-      const edges = new EdgesGeometry(new BoxGeometry(size.x, size.y, size.z));
-      const line = new LineSegments(edges, new LineBasicMaterial({ color: 0xff00ff }));
-      // The bounding box also needs to be at origin after recentering
-      line.position.set(0, 0, 0);
-      setBboxObj(line);
-    } else {
-      setBboxObj(null);
-    }
-
-    // New: Try to center around neckline/collar for visual balance
-    // Visual Y center ≈ collar/top ~ bbox.max.y
-    // Place model so that center of canvas aligns with collar minus an offset (for a little headroom)
-    const yFromOriginToTop = bbox.max.y + model.position.y;
-    // This offset places the collar line closer to the canvas center.
-    // You may tweak the collarYOffset per garment for best results!
-    const groupPosition: [number, number, number] = [
-      0,
-      config.baseYOffset - yFromOriginToTop + (config.collarYOffset ?? 0),
-      0
-    ];
-
-    model.userData.__groupPosition = groupPosition;
+    
     setCurrentModel(model);
-
     setIsLoading(false);
-  }, [scene, selectedProduct]);
+    
+    console.log(`Model ${selectedProduct} loaded successfully with bbox:`, bbox);
+  }, [scene, selectedProduct, config.scale]);
 
-  // Apply color to model with improved material properties for realistic fabric appearance
+  // Apply color to model materials
   useEffect(() => {
     if (currentModel) {
       currentModel.traverse((child: any) => {
@@ -113,27 +81,18 @@ export const ModelManager = () => {
           child.material = child.material.clone();
           child.material.color.set(baseColor);
           
-          // Improve fabric realism with enhanced properties
-          child.material.roughness = 0.85; // More fabric-like surface
-          child.material.metalness = 0.0; // No metallic properties for fabric
-          child.material.envMapIntensity = 0.3; // Subtle environment reflection
-          
-          // Add subtle normal mapping effect if available
-          if (child.material.normalMap) {
-            child.material.normalScale.set(0.6, 0.6);
-          }
-          
-          // Enhanced fabric properties for better physics interaction
+          // Standard fabric properties
+          child.material.roughness = 0.8;
+          child.material.metalness = 0.0;
           child.material.transparent = false;
-          child.material.side = 2; // DoubleSide for better deformation visibility
           
           child.material.needsUpdate = true;
         }
       });
     }
-  }, [currentModel, baseColor, selectedProduct]);
+  }, [currentModel, baseColor]);
 
-  // Camera view rotation (keeps model visually centered because group is at [0,...,0])
+  // Camera view rotation
   useFrame(() => {
     if (groupRef.current) {
       const targetRotation = cameraView === 'back' ? Math.PI :
@@ -142,15 +101,11 @@ export const ModelManager = () => {
     }
   });
 
-  const handleDeformationUpdate = (deformation: DeformationData) => {
-    setDeformationData(deformation);
-  };
-
   if (error) {
     return (
       <group>
-        <mesh>
-          <boxGeometry args={[1, 1.5, 0.1]} />
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry args={[6, 8, 0.6]} />
           <meshStandardMaterial color="#ff6b6b" />
         </mesh>
       </group>
@@ -160,37 +115,23 @@ export const ModelManager = () => {
   if (isLoading || !currentModel) {
     return (
       <group>
-        <mesh>
-          <boxGeometry args={[1, 1.5, 0.1]} />
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry args={[6, 8, 0.6]} />
           <meshStandardMaterial color="#cccccc" />
         </mesh>
       </group>
     );
   }
 
-  // Read dynamic group centering position (falls back to [0, config.baseYOffset, 0])
-  const groupPosition: [number, number, number] = (currentModel.userData && currentModel.userData.__groupPosition) || [0, config.baseYOffset, 0];
-
   return (
     <group
       ref={groupRef}
       scale={config.scale}
-      position={groupPosition}
+      position={[0, config.yOffset, 0]}
     >
-      {/* Model centered at [0,0,0] */}
       <primitive object={currentModel} />
-      
-      {/* Enhanced design rendering system */}
       <DesignRenderer garmentScale={config.scale} />
-      
-      {/* Show bounding box for debugging */}
-      {bboxObj && <primitive object={bboxObj} />}
-      
-      {/* Enhanced Animation Controller with fabric physics */}
-      <AnimationController 
-        groupRef={groupRef} 
-        onDeformationUpdate={handleDeformationUpdate}
-      />
+      <AnimationController groupRef={groupRef} />
     </group>
   );
 };
