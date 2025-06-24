@@ -25,10 +25,10 @@ export const Scene = () => {
     >
       <Canvas
         camera={{
-          position: [0, 0, 35], // Moved camera further back for larger models
-          fov: 50, // Wider field of view for better visibility
+          position: [0, 0.5, 8],
+          fov: 32,
           near: 0.1,
-          far: 2000,
+          far: 1000,
         }}
         shadows={{
           type: PCFSoftShadowMap,
@@ -44,11 +44,11 @@ export const Scene = () => {
         }}
       >
         <Suspense fallback={<ModelLoadingSpinner />}>
-          {/* Enhanced lighting setup for much larger models */}
-          <ambientLight intensity={0.8} />
+          {/* Optimized lighting setup */}
+          <ambientLight intensity={0.6} />
           <directionalLight
-            position={[20, 20, 15]}
-            intensity={4}
+            position={[10, 10, 5]}
+            intensity={1.5}
             castShadow
             shadow-mapSize-width={2048}
             shadow-mapSize-height={2048}
@@ -56,49 +56,41 @@ export const Scene = () => {
           
           {/* Fill light */}
           <directionalLight
-            position={[-15, 15, -15]}
-            intensity={2}
+            position={[-5, 5, -5]}
+            intensity={0.8}
             color="#ffffff"
-          />
-          
-          {/* Rim light for better definition */}
-          <directionalLight
-            position={[0, 0, -25]}
-            intensity={2.5}
-            color="#74b9ff"
           />
 
           {/* Environment lighting */}
           <Environment preset="studio" background={false} />
 
-          {/* Centered and enlarged model */}
+          {/* Model with simplified loading system */}
           <ModelManager />
 
-          {/* Ground shadows positioned for bigger models */}
+          {/* Ground shadows */}
           <ContactShadows
             rotation-x={Math.PI / 2}
-            position={[0, -12, 0]}
+            position={[0, -2.5, 0]}
             opacity={0.4}
-            width={30}
-            height={30}
+            width={8}
+            height={8}
             blur={2}
-            far={15}
+            far={4}
           />
 
-          {/* Enhanced orbit controls with much better zoom range */}
+          {/* Orbit controls */}
           <OrbitControls
-            enablePan={true}
+            enablePan={false}
             enableZoom={true}
             enableRotate={true}
-            minDistance={8} // Allow much closer zoom
-            maxDistance={100} // Allow much further zoom
-            minPolarAngle={Math.PI / 8}
-            maxPolarAngle={Math.PI - Math.PI / 8}
+            minDistance={2}
+            maxDistance={30}
+            minPolarAngle={Math.PI / 6}
+            maxPolarAngle={Math.PI - Math.PI / 6}
             target={[0, 0, 0]}
             autoRotate={false}
             enableDamping={true}
             dampingFactor={0.05}
-            zoomSpeed={1.5} // Faster zoom response
           />
         </Suspense>
       </Canvas>
