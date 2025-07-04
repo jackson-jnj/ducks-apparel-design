@@ -1,8 +1,8 @@
 
-import { useRef, useEffect, useMemo } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useRef, useEffect } from 'react';
+import { useFrame } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
-import { Mesh, PlaneGeometry, MeshBasicMaterial, Vector3, CanvasTexture, Texture } from 'three';
+import { Mesh, PlaneGeometry, MeshBasicMaterial, Vector3 } from 'three';
 import { useDesignStore } from '@/store/designStore';
 import { useConfiguratorStore } from '@/store/configuratorStore';
 
@@ -14,65 +14,65 @@ export const DesignRenderer = ({ garmentScale }: DesignRendererProps) => {
   const { designs, selectedDesignId } = useDesignStore();
   const { cameraView } = useConfiguratorStore();
   const meshRefs = useRef<{ [key: string]: Mesh }>({});
-  const { scene } = useThree();
 
-  // Calculate position based on camera view - properly typed as Vector3 tuple
-  const getPositionForView = (design: any): [number, number, number] => {
-    const baseZ = 0.51; // Always in front of garment
+  // Calculate position based on design side and camera view
+  const getPositionForDesign = (design: any): [number, number, number] => {
     const [x, y] = design.position;
+    const baseZ = 0.51; // Distance from garment surface
     
-    switch (cameraView) {
-      case 'back':
-        return [x, y, -baseZ]; // Behind garment for back view
-      case 'side':
-        return [baseZ, y, x]; // Side positioning
-      default:
-        return [x, y, baseZ]; // Front view
+    // For front designs
+    if (design.side === 'front') {
+      switch (cameraView) {
+        case 'back':
+          return [x, y, -baseZ * 3]; // Hide behind garment when viewing back
+        case 'side':
+          return [baseZ, y, x]; // Side positioning
+        default:
+          return [x, y, baseZ]; // Front view
+      }
+    }
+    
+    // For back designs
+    else {
+      switch (cameraView) {
+        case 'back':
+          return [-x, y, baseZ]; // Flip X for back view (mirror effect)
+        case 'side':
+          return [-baseZ, y, x]; // Side positioning (opposite side)
+        default:
+          return [x, y, -baseZ * 3]; // Hide behind garment when viewing front
+      }
     }
   };
 
-  // Enhanced texture loading with proper sizing
-  const createDesignTexture = (imageUrl: string): Texture => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d')!;
-    const img = new Image();
+  // Check if design should be visible based on current view and design side
+  const isDesignVisible = (design: any): boolean => {
+    if (cameraView === 'side') return true; // Always show in side view
     
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      canvas.width = 512;
-      canvas.height = 512;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Draw image centered and scaled properly
-      const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
-      const x = (canvas.width - img.width * scale) / 2;
-      const y = (canvas.height - img.height * scale) / 2;
-      
-      ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-    };
-    img.src = imageUrl;
+    if (design.side === 'front' && cameraView === 'front') return true;
+    if (design.side === 'back' && cameraView === 'back') return true;
     
-    const texture = new CanvasTexture(canvas);
-    texture.needsUpdate = true;
-    return texture;
+    return false;
   };
 
   return (
     <>
       {designs.map((design) => {
-        const position = getPositionForView(design);
+        if (!isDesignVisible(design)) return null;
+        
+        const position = getPositionForDesign(design);
         const isSelected = selectedDesignId === design.id;
         
         return (
           <mesh
-            key={`${design.id}-${cameraView}`}
+            key={`${design.id}-${cameraView}-${design.side}`}
             ref={(mesh) => {
               if (mesh) meshRefs.current[design.id] = mesh;
             }}
             position={position}
             rotation={[0, 0, design.rotation]}
             scale={[design.scale[0], design.scale[1], 1]}
-            userData={{ designId: design.id }}
+            userData={{ designId: design.id, side: design.side }}
           >
             <planeGeometry args={[1, 1, 16, 16]} />
             <meshBasicMaterial
@@ -83,6 +83,7 @@ export const DesignRenderer = ({ garmentScale }: DesignRendererProps) => {
               depthTest={true}
               depthWrite={false}
             />
+            
             {/* Selection indicator */}
             {isSelected && (
               <lineSegments>

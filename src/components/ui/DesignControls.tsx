@@ -3,6 +3,7 @@ import { useDesignStore } from "@/store/designStore";
 import { Slider } from "./slider";
 import { Button } from "./button";
 import { RotateCcw, Eye, EyeOff } from "lucide-react";
+import { Badge } from "./badge";
 
 export const DesignControls = () => {
   const { 
@@ -12,7 +13,8 @@ export const DesignControls = () => {
     updateDesignScale,
     updateDesignRotation,
     updateDesignOpacity,
-    resetDesign
+    resetDesign,
+    activeSide
   } = useDesignStore();
 
   const selectedDesign = designs.find(d => d.id === selectedDesignId);
@@ -21,7 +23,12 @@ export const DesignControls = () => {
     return (
       <div>
         <h3 className="text-sm font-medium mb-3">Design Controls</h3>
-        <p className="text-sm text-muted-foreground">Select a design to see controls</p>
+        <p className="text-sm text-muted-foreground">
+          Select a design to see controls
+        </p>
+        <div className="mt-2 text-xs text-muted-foreground">
+          Currently editing: <span className="font-medium capitalize">{activeSide}</span> side
+        </div>
       </div>
     );
   }
@@ -47,7 +54,17 @@ export const DesignControls = () => {
             alt={selectedDesign.name}
             className="w-8 h-8 object-contain bg-white rounded"
           />
-          <span className="text-sm font-medium truncate">{selectedDesign.name}</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium truncate">{selectedDesign.name}</span>
+              <Badge 
+                variant={selectedDesign.side === 'front' ? 'default' : 'secondary'}
+                className="text-xs px-1.5 py-0.5"
+              >
+                {selectedDesign.side}
+              </Badge>
+            </div>
+          </div>
         </div>
 
         {/* Position Controls */}
@@ -93,7 +110,9 @@ export const DesignControls = () => {
 
         {/* Rotation Control */}
         <div>
-          <label className="text-xs font-medium mb-2 block">Rotation</label>
+          <label className="text-xs font-medium mb-2 block">
+            Rotation ({Math.round((selectedDesign.rotation * 180) / Math.PI)}°)
+          </label>
           <Slider
             value={[selectedDesign.rotation]}
             onValueChange={([value]) => 
@@ -107,7 +126,9 @@ export const DesignControls = () => {
 
         {/* Opacity Control */}
         <div>
-          <label className="text-xs font-medium mb-2 block">Opacity</label>
+          <label className="text-xs font-medium mb-2 block">
+            Opacity ({Math.round(selectedDesign.opacity * 100)}%)
+          </label>
           <Slider
             value={[selectedDesign.opacity]}
             onValueChange={([value]) => 
